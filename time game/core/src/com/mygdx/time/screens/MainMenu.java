@@ -26,7 +26,6 @@ import aurelienribon.tweenengine.TweenManager;
 public class MainMenu implements Screen {
 
 	private Stage stage;
-	private TextureAtlas atlas;
 	private Skin skin;
 	private Table table;
 	private TextButton buttonPlay, buttonExit;
@@ -48,9 +47,7 @@ public class MainMenu implements Screen {
 		 stage = new Stage(new ScreenViewport());
 		 
 		 Gdx.input.setInputProcessor(stage);
-		 
-		 atlas = new TextureAtlas("ui/atlas.pack");
-		 skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), atlas);
+		 skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), new TextureAtlas("ui/atlas.pack"));
 		 
 		 music = Gdx.audio.newMusic(Gdx.files.internal("sound/castaway.mp3"));
 	     music.setLooping(true);
@@ -64,7 +61,6 @@ public class MainMenu implements Screen {
 
 		 
 		 //settings for header
-
 		 heading = new Label("cat plant menu !", skin);
 		 heading.setFontScale(0.7f);
 		 
@@ -134,7 +130,6 @@ public class MainMenu implements Screen {
 		 //creating animations
 		 tweenManager = new TweenManager();
 		 Tween.registerAccessor(Actor.class, new ActorAccessor());
-
 		 //cats fade in
 		 Timeline.createSequence().beginSequence()
 		 	.push(Tween.set(catImage, ActorAccessor.RGB).target(1,0,1))
@@ -204,8 +199,7 @@ public class MainMenu implements Screen {
 
 			fadeTimer += delta;
 			if(fadeTimer > 3){
-				 ((TimeGame) Gdx.app.getApplicationListener()).setScreen(new MapOne());
-				 dispose();
+				 ((TimeGame) Gdx.app.getApplicationListener()).setScreen(new MapTwo());
 			}
 		}
 		
@@ -247,7 +241,6 @@ public class MainMenu implements Screen {
 			fadeTimer += delta;
 			 if(fadeTimer > 2){
 				 ((TimeGame)Gdx.app.getApplicationListener()).setScreen(new SettingsMenu());
-				 dispose();
 			 }
 		}
 		
@@ -275,15 +268,13 @@ public class MainMenu implements Screen {
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
+		dispose();
 		
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		stage.dispose();
-		atlas.dispose();
 		skin.dispose();
 		music.dispose();
 		catTexture.dispose();

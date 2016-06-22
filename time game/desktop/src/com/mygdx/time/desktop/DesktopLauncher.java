@@ -7,7 +7,7 @@ import com.mygdx.time.TimeGame;
 
 public class DesktopLauncher {
 	
-	//Timestamp: Jun 20, 2016, 12:54:48 PM
+	//Timestamp: Jun 22, 2016, 12:02:36 PM
 	
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

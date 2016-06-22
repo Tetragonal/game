@@ -2,6 +2,7 @@ package com.mygdx.time;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.screens.Splash;
 
 public class TimeGame extends Game {
@@ -10,9 +11,10 @@ public class TimeGame extends Game {
 	
 	@Override
 	public void create() {
-		 batch = new SpriteBatch();
-		setScreen(new Splash());
+		LevelScreenManager.getInstance().initialize();
 		
+		batch = new SpriteBatch();
+		setScreen(new Splash());
 	}
 
 	@Override

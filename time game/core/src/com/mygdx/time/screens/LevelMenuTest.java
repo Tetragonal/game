@@ -32,7 +32,7 @@ public class LevelMenuTest implements Screen{
 		skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), atlas);
 		
 		table = new Table(skin);
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setFillParent(true);
 		
 		list = new List<String>(skin);
 		list.setItems(new String[] {"one", "two", "threeeee3", "and", "so", "on", "a", "b", "c", "d", "e", "f", "g"});
@@ -57,12 +57,9 @@ public class LevelMenuTest implements Screen{
 		//putting stuff together
 		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		table.add("Select level", "white").expandX().colspan(3).row();
-		table.add().width(table.getWidth()/3);
-		table.add().width(table.getWidth()/3);
-		table.add().width(table.getWidth()/3).row();
-		table.add(scrollPane).expandY().left();
-		table.add(play);
-		table.add(back).bottom().right();
+		table.add(scrollPane).uniformX().expandY().left();
+		table.add(play).uniformX();
+		table.add(back).uniformX().bottom().right();
 		
 		stage.addActor(table);
 	}
@@ -99,14 +96,15 @@ public class LevelMenuTest implements Screen{
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
+		dispose();
 		
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		stage.dispose();
+		atlas.dispose();
+		skin.dispose();
 	}
 
 }

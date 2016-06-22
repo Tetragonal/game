@@ -1,6 +1,7 @@
 package com.mygdx.time.entities;
 
 import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
@@ -17,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.mygdx.time.screens.MapOne;
+import com.mygdx.time.screens.LevelScreen;
 
 public class Player extends Actor{
 	
@@ -90,6 +91,9 @@ public class Player extends Actor{
 		move(delta);
 		handlePositionLog(delta);
 		checkWarp(location.x+sprite.getWidth(), location.y+sprite.getHeight());
+		checkWarp(location.x, location.y+sprite.getHeight());
+		checkWarp(location.x+sprite.getWidth(), location.y);
+		checkWarp(location.x-1, location.y-1);
 	}
 	
 	//-------------------------------------------------------------------
@@ -97,7 +101,7 @@ public class Player extends Actor{
 	public void checkWarp(float x, float y){
 		cell = collisionLayer.getCell((int)(x/collisionLayer.getTileWidth()), (int)(y/collisionLayer.getTileHeight()));
 		if(cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(warpKey)){
-			warpDestination = "MapTwo";
+			warpDestination = (String) cell.getTile().getProperties().get(warpKey);
 		}
 	}
 	
@@ -152,7 +156,7 @@ public class Player extends Actor{
 	public void handleInput(float delta){
 		inputTimer+= delta;
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-MapOne.CAMERA_OFFSET_X)){
+        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-LevelScreen.CAMERA_OFFSET_X || lmbHeldDown == true)){
 	        	if(lmbHeldDown == false || inputTimer > .2 || Math.abs(location.y-worldDestination.y+sprite.getHeight()/2) < 1  || Math.abs(location.x-worldDestination.x+sprite.getWidth()/2) < 1 || collidesRight() || collidesTop() || collidesBottom() || collidesLeft()){
 	        		if(inputTimer > .2)
 	        		{

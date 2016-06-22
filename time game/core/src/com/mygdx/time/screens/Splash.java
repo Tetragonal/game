@@ -38,7 +38,6 @@ public class Splash implements Screen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0,1,1,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
 		tweenManager.update(delta);
 		waitTimer += delta;
 		
@@ -48,14 +47,12 @@ public class Splash implements Screen{
 		
 		if(waitTimer > 3){
 			game.setScreen(new MainMenu());
-			dispose();
 		}
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
+		splash.setSize(width, height);
 	}
 
 	@Override
@@ -72,7 +69,7 @@ public class Splash implements Screen{
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
+		dispose();
 		
 	}
 
@@ -80,7 +77,6 @@ public class Splash implements Screen{
 	public void dispose() {
 		splashTexture.dispose();
 		meowSound.dispose();
-		
 	}
 
 }

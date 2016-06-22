@@ -110,7 +110,7 @@ public class SettingsMenu implements Screen {
 		back.addListener(buttonHandler);
 		
 		// putting everything in the table
-		table.add(new Label("SETTINGS", skin)).spaceBottom(50).colspan(3).expandX().row();
+		table.add(new Label("SETTINGS (unfinished)", skin)).spaceBottom(50).colspan(3).expandX().row();
 		table.add();
 		table.add("level directory");
 		table.add().row();

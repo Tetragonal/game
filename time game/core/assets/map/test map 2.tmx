@@ -37,6 +37,11 @@
     <property name="blocked" value=""/>
    </properties>
   </tile>
+  <tile id="67">
+   <properties>
+    <property name="warp" value="map_1"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Background" width="16" height="10">
   <data encoding="csv">
@@ -77,7 +82,7 @@
 59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3221225531,
 59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3221225531,
 59,0,0,0,0,0,22,0,0,22,0,0,0,0,0,3221225531,
-58,50,50,50,50,51,30,10,10,30,49,50,50,50,50,58
+58,50,50,50,50,51,30,68,68,30,49,50,50,50,50,58
 </data>
  </layer>
 </map>
