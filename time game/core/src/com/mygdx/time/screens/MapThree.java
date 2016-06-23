@@ -1,11 +1,11 @@
 package com.mygdx.time.screens;
 
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-
 public class MapThree extends LevelScreen{
 
 	public void show(){
-		map = new TmxMapLoader().load("map/test map 3.tmx");
+		mapFile = "map/test map 3.tmx";
+		musicFile = "sound/fourseasons.mp3";
+		musicVolume = 0.2f;
 		startX = 15;
 		startY = 5;
 		super.show();

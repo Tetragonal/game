@@ -3,7 +3,6 @@ package com.mygdx.time.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -22,14 +22,17 @@ import com.mygdx.time.TimeGame;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.manager.LevelScreenEnum;
 import com.mygdx.time.manager.LevelScreenManager;
+import com.mygdx.time.manager.MusicManager;
 
 public abstract class LevelScreen implements Screen{
-	
+
 	protected Stage stage;
 	protected TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 	private OrthographicCamera camera;
-	private Music music;
+	
+	protected String mapFile;
+	protected String musicFile;
 	
 	private BitmapFont font = new BitmapFont();
 	private Batch spriteBatch;
@@ -37,7 +40,8 @@ public abstract class LevelScreen implements Screen{
 	private FitViewport viewport;
 	
 	private Player player;
-	protected int startX, startY;
+	protected float startX, startY;
+	protected float musicVolume;
 	
 	private int[] backgroundLayers = {0,1};
 	private int[] foregroundLayers = {2};
@@ -53,6 +57,7 @@ public abstract class LevelScreen implements Screen{
 	public void show() { //create()
 		game = (TimeGame) Gdx.app.getApplicationListener();
 		spriteBatch = game.batch;
+		map = new TmxMapLoader().load(mapFile);
 		renderer = new OrthogonalTiledMapRenderer(map);
 		camera = new OrthographicCamera();
 		
@@ -64,13 +69,10 @@ public abstract class LevelScreen implements Screen{
 		stage.addActor(player);
 		stage.setKeyboardFocus(player);	
 		
-		//loop music
-        music = Gdx.audio.newMusic(Gdx.files.internal("sound/fourseasons.mp3"));
-        music.setLooping(true);
-        music.setVolume(0.2f);
-        music.play();	
-        
-        
+		//set music
+		if(musicFile != null){
+			MusicManager.getInstance().setFadeMusic(Gdx.files.internal(musicFile), 6, musicVolume);
+		}  
 	}
 
 	@Override
@@ -79,6 +81,7 @@ public abstract class LevelScreen implements Screen{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		handleInput();
 		stage.act(Gdx.graphics.getDeltaTime());
+		MusicManager.getInstance().update(delta);
 		
 		//center camera on player
 		
@@ -158,7 +161,6 @@ public abstract class LevelScreen implements Screen{
 		map.dispose();
 		renderer.dispose();
 		ghost.dispose();
-		music.dispose();
 		stage.dispose();
 		font.dispose();
 		shapeRenderer.dispose();

@@ -2,7 +2,6 @@ package com.mygdx.time.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -17,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.manager.MusicManager;
 import com.mygdx.time.tween.ActorAccessor;
 
 import aurelienribon.tweenengine.Timeline;
@@ -36,7 +36,6 @@ public class MainMenu implements Screen {
 	private Image catImage = new Image(catTexture);
 	private Image catImage2 = new Image(catTexture);
 	private Image settingsImage = new Image(settingsTexture);
-	private Music music;
 	
 	private boolean playClicked = false, exitClicked = false, settingsClicked = false;
 	private float fadeTimer = 0;
@@ -49,10 +48,8 @@ public class MainMenu implements Screen {
 		 Gdx.input.setInputProcessor(stage);
 		 skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), new TextureAtlas("ui/atlas.pack"));
 		 
-		 music = Gdx.audio.newMusic(Gdx.files.internal("sound/castaway.mp3"));
-	     music.setLooping(true);
-	     music.setVolume(0.2f);
-	     music.play();
+		 //set music
+		 MusicManager.getInstance().setFadeMusic(Gdx.files.internal("sound/castaway.mp3"), 6, 0.2f);
 				 
 		 table = new Table(skin);
 		 table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -176,6 +173,7 @@ public class MainMenu implements Screen {
 		Gdx.gl.glClearColor(0,1,1,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		MusicManager.getInstance().update(delta);
 		tweenManager.update(delta);
 		
 		stage.act(delta);
@@ -184,8 +182,6 @@ public class MainMenu implements Screen {
 		timer += delta;
 		
 		if(playClicked){
-			music.setVolume(0.2f/(1+2*fadeTimer*fadeTimer));
-			
 			if(fadeTimer == 0){
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
@@ -204,8 +200,7 @@ public class MainMenu implements Screen {
 		}
 		
 		if(exitClicked){
-			music.setVolume(0.2f/(1+2*fadeTimer*fadeTimer));
-			
+			//TODO fade music to nothing
 			if(fadeTimer == 0){
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
@@ -225,7 +220,7 @@ public class MainMenu implements Screen {
 		
 		
 		if(settingsClicked){
-			music.setVolume(0.2f/(1+2*fadeTimer*fadeTimer));
+			//TODO fade music to nothing
 			
 			if(fadeTimer == 0){
 				Timeline.createParallel().beginParallel()
@@ -276,7 +271,6 @@ public class MainMenu implements Screen {
 	public void dispose() {
 		stage.dispose();
 		skin.dispose();
-		music.dispose();
 		catTexture.dispose();
 	}
 
