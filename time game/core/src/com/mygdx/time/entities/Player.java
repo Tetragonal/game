@@ -28,7 +28,7 @@ public class Player extends Actor{
 	private String blockedKey = "blocked";
 	private String warpKey = "warp";
 	private TiledMapTileLayer collisionLayer;
-	private Music walkSound = Gdx.audio.newMusic(Gdx.files.internal("sound/walksound.mp3"));
+	public Music walkSound = Gdx.audio.newMusic(Gdx.files.internal("sound/walksound.mp3"));
 	private Sound tpSound = Gdx.audio.newSound(Gdx.files.internal("sound/warp2.ogg"));
 	
 	private Vector3 worldCoordinates = new Vector3();
@@ -294,21 +294,5 @@ public class Player extends Actor{
 			}
 		}
 		return false;
-	}
-
-	public float getMaxSpeed() {
-		return maxSpeed;
-	}
-
-	public void setMaxSpeed(float maxSpeed) {
-		this.maxSpeed = maxSpeed;
-	}
-
-	public TiledMapTileLayer getCollisionLayer() {
-		return collisionLayer;
-	}
-
-	public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
-		this.collisionLayer = collisionLayer;
 	}
 }

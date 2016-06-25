@@ -55,7 +55,7 @@ public class LevelMenuTest implements Screen{
 		back.pad(10);
 		
 		//putting stuff together
-		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		table.setFillParent(true);
 		table.add("Select level", "white").expandX().colspan(3).row();
 		table.add(scrollPane).uniformX().expandY().left();
 		table.add(play).uniformX();
@@ -76,7 +76,6 @@ public class LevelMenuTest implements Screen{
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
-		table.setFillParent(true);
 		table.invalidateHierarchy();
 		table.setSize(width, height);
 		

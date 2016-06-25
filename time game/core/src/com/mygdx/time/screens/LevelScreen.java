@@ -2,12 +2,15 @@ package com.mygdx.time.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -16,7 +19,16 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.entities.Player;
@@ -25,11 +37,16 @@ import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
 
 public abstract class LevelScreen implements Screen{
-
-	protected Stage stage;
+	
+	private Group entities = new Group();
+	private Window pauseWindow;
+	private InputMultiplexer inputMultiplexer = new InputMultiplexer();
+	
+	protected Stage stage, uiStage;
 	protected TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 	private OrthographicCamera camera;
+	private TiledMapTileLayer layer;
 	
 	protected String mapFile;
 	protected String musicFile;
@@ -38,6 +55,7 @@ public abstract class LevelScreen implements Screen{
 	private Batch spriteBatch;
 	private ShapeRenderer shapeRenderer = new ShapeRenderer();
 	private FitViewport viewport;
+	private Skin skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), new TextureAtlas("ui/atlas.pack"));
 	
 	private Player player;
 	protected float startX, startY;
@@ -55,24 +73,82 @@ public abstract class LevelScreen implements Screen{
 	
 	@Override
 	public void show() { //create()
+		
 		game = (TimeGame) Gdx.app.getApplicationListener();
 		spriteBatch = game.batch;
+		
 		map = new TmxMapLoader().load(mapFile);
 		renderer = new OrthogonalTiledMapRenderer(map);
 		camera = new OrthographicCamera();
 		
 		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 		stage = new Stage(viewport, spriteBatch);
-		Gdx.input.setInputProcessor(stage);
-		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(2);
+		uiStage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), spriteBatch);
+		stage.addActor(entities);
+		inputMultiplexer.addProcessor(stage);
+		inputMultiplexer.addProcessor(uiStage);
+		Gdx.input.setInputProcessor(inputMultiplexer);
+		layer = (TiledMapTileLayer) map.getLayers().get(2);
 		player = new Player(layer, startX*layer.getTileWidth(), (layer.getHeight()-startY)*layer.getTileHeight());
-		stage.addActor(player);
+		entities.addActor(player);
 		stage.setKeyboardFocus(player);	
 		
 		//set music
 		if(musicFile != null){
-			MusicManager.getInstance().setFadeMusic(Gdx.files.internal(musicFile), 6, musicVolume);
+			MusicManager.getInstance().setTransitionMusic(Gdx.files.internal(musicFile), 6, musicVolume);
 		}  
+		
+		//independent pause menu
+		skin.getFont("black").getData().setScale(0.5f);
+		pauseWindow = new Window("", skin);
+		TextButton resumeButton = new TextButton("Resume", skin);
+		TextButton exitButton = new TextButton("Quit", skin);
+		TextButton menuButton = new TextButton("Menu", skin);
+		Label titleLabel = new Label("Paused", skin);
+		resumeButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				pauseWindow.setVisible(false);
+			}
+		});
+		exitButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				Gdx.app.exit();
+			}
+		});
+		menuButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				game.setScreen(new MainMenu());
+				
+			}
+		});
+		exitButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				Gdx.app.exit();
+			}
+		});
+		pauseWindow.align(Align.top);
+		pauseWindow.add(titleLabel).padBottom(120).row();
+		pauseWindow.add(resumeButton).size(250, 75).padBottom(15).row();
+		pauseWindow.add(menuButton).size(200, 75).padBottom(15).row();
+		pauseWindow.add(exitButton).size(200, 75);
+		pauseWindow.setSize(Gdx.graphics.getWidth()/3f, Gdx.graphics.getHeight()/1.5f);
+		pauseWindow.setPosition(Gdx.graphics.getWidth()/3f, Gdx.graphics.getHeight()/6f);
+		uiStage.addActor(pauseWindow);
+		pauseWindow.setVisible(false);
+		
+		stage.addCaptureListener(new InputListener() {
+			@Override
+			public boolean keyDown(InputEvent event, int keycode){
+				if(keycode == Keys.ESCAPE){
+					pauseWindow.setVisible(!pauseWindow.isVisible());
+				}
+				return true;
+			}
+		});
 	}
 
 	@Override
@@ -80,7 +156,11 @@ public abstract class LevelScreen implements Screen{
 		Gdx.gl.glClearColor(0,0,0,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		handleInput();
-		stage.act(Gdx.graphics.getDeltaTime());
+		if(!pauseWindow.isVisible()){
+			stage.act(Gdx.graphics.getDeltaTime());
+		}else {
+			player.walkSound.pause();;
+		}
 		MusicManager.getInstance().update(delta);
 		
 		//center camera on player
@@ -104,22 +184,24 @@ public abstract class LevelScreen implements Screen{
 		if(player.secondTimer > player.WARP_SECONDS){
 			spriteBatch.draw(ghost, player.ghostX-ghost.getWidth()/2,player.ghostY-ghost.getHeight()/2);
 		}
-		spriteBatch.end();
 		
 		//draw actors
-		stage.draw();
+		entities.draw(spriteBatch, 1);
+		spriteBatch.end();
 		
 		//draw foreground layers
 		renderer.render(foregroundLayers);
 		
-		//draw fps counter
+		//draw ui
 		uiMatrix = camera.combined.cpy();
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		spriteBatch.setProjectionMatrix(uiMatrix);
 		spriteBatch.begin();
-		font.draw(spriteBatch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, -/+ to zoom camera", 10, 15);
+			font.draw(spriteBatch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, -/+ to zoom camera", 10, 15);
 		spriteBatch.end();
+		uiStage.draw();
 		spriteBatch.setProjectionMatrix(camera.combined);
+		
 		
 		//draw rectangle
 		shapeRenderer.begin(ShapeType.Filled);
@@ -127,9 +209,18 @@ public abstract class LevelScreen implements Screen{
 		shapeRenderer.rect(camera.viewportWidth-CAMERA_OFFSET_X, 0, CAMERA_OFFSET_X, camera.viewportHeight);
 		shapeRenderer.end();
 		
+//		Vector2 test = new Vector2((Gdx.graphics.getWidth()/3) ,Gdx.graphics.getHeight()-((Gdx.graphics.getHeight()-pauseWindow.getHeight())/4));
+//		test.set(viewport.unproject(test));
+//		pauseWindow.setSize(Gdx.graphics.getWidth()/3f*camera.zoom, Gdx.graphics.getHeight()/1.5f*camera.zoom);
+//		skin.getFont("black").getData().setScale(0.5f*camera.zoom);
+//		pauseWindow.setPosition(test.x, test.y);
+//		spriteBatch.begin();
+//		ui.draw(spriteBatch, 1);
+//		spriteBatch.end();
+		
+		
 		if(player.warpDestination != null)
 		{
-			player.disposeAssets();
 			LevelScreenManager.getInstance().setScreen(LevelScreenEnum.valueOf(player.warpDestination));
 		}
 	}
@@ -158,9 +249,12 @@ public abstract class LevelScreen implements Screen{
 
 	@Override
 	public void dispose() {
+		player.disposeAssets();
 		map.dispose();
 		renderer.dispose();
 		ghost.dispose();
+		uiStage.dispose();
+		skin.dispose();
 		stage.dispose();
 		font.dispose();
 		shapeRenderer.dispose();

@@ -49,10 +49,10 @@ public class MainMenu implements Screen {
 		 skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), new TextureAtlas("ui/atlas.pack"));
 		 
 		 //set music
-		 MusicManager.getInstance().setFadeMusic(Gdx.files.internal("sound/castaway.mp3"), 6, 0.2f);
+		 MusicManager.getInstance().setTransitionMusic(Gdx.files.internal("sound/castaway.mp3"), 6, 0.2f);
 				 
 		 table = new Table(skin);
-		 table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		 table.setFillParent(true);
 
 		 skin.getFont("black").getData().setScale(0.5f);
 
@@ -200,7 +200,7 @@ public class MainMenu implements Screen {
 		}
 		
 		if(exitClicked){
-			//TODO fade music to nothing
+			MusicManager.getInstance().setFadeMusic(2);
 			if(fadeTimer == 0){
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
@@ -220,8 +220,7 @@ public class MainMenu implements Screen {
 		
 		
 		if(settingsClicked){
-			//TODO fade music to nothing
-			
+			MusicManager.getInstance().setFadeMusic(2);
 			if(fadeTimer == 0){
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
@@ -244,7 +243,6 @@ public class MainMenu implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
-		table.setFillParent(true);
 		table.invalidateHierarchy();
 		table.setSize(width, height);
 	}

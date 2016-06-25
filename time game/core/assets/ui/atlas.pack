@@ -5,28 +5,28 @@ filter: Nearest,Nearest
 repeat: none
 checkbox.off
   rotate: false
-  xy: 0, 39
+  xy: 1, 23
   size: 39, 39
   orig: 39, 39
   offset: 0, 0
   index: -1
 checkbox.on
   rotate: false
-  xy: 0, 0
+  xy: 42, 23
   size: 39, 39
   orig: 39, 39
   offset: 0, 0
   index: -1
 checkbox.over
   rotate: false
-  xy: 39, 39
+  xy: 83, 23
   size: 39, 39
   orig: 39, 39
   offset: 0, 0
   index: -1
 button.down
   rotate: false
-  xy: 39, 30
+  xy: 1, 12
   size: 9, 9
   split: 2, 2, 2, 2
   orig: 9, 9
@@ -34,7 +34,7 @@ button.down
   index: -1
 button.up
   rotate: false
-  xy: 39, 21
+  xy: 1, 1
   size: 9, 9
   split: 1, 2, 1, 2
   orig: 9, 9
@@ -42,35 +42,42 @@ button.up
   index: -1
 color.black
   rotate: false
-  xy: 48, 38
+  xy: 124, 61
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+color.blackTranslucent
+  rotate: false
+  xy: 12, 20
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 color.blueTranslucent
   rotate: false
-  xy: 39, 20
+  xy: 124, 58
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 color.white
   rotate: false
-  xy: 48, 37
+  xy: 12, 17
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 default.selection
   rotate: false
-  xy: 49, 38
+  xy: 15, 20
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 default.transparent
   rotate: false
-  xy: 39, 19
+  xy: 124, 55
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

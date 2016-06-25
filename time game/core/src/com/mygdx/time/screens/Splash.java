@@ -25,6 +25,9 @@ public class Splash implements Screen{
 
 	@Override
 	public void show() {
+		//apply preferences
+		Gdx.graphics.setVSync(SettingsMenu.vSync());
+		
 		game = (TimeGame) Gdx.app.getApplicationListener();
 		splash.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		meowSound.play();

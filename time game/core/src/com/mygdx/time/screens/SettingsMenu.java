@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.manager.MusicManager;
 
 public class SettingsMenu implements Screen {
 
@@ -43,6 +44,7 @@ public class SettingsMenu implements Screen {
 		Gdx.gl.glClearColor(0, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		MusicManager.getInstance().update(delta);
 		stage.act(delta);
 		stage.draw();
 	}
@@ -50,7 +52,6 @@ public class SettingsMenu implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
-		table.setFillParent(true);
 		table.invalidateHierarchy();
 		table.setSize(width, height);
 	}

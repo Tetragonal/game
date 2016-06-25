@@ -22,7 +22,7 @@ public class LevelScreenManager {
 		return instance;
 	}
 	
-	/** Sets screen by searching through enum. */
+	/** Sets screen by searching through the enum for the keyword. */
 	public void setScreen(LevelScreenEnum screenEnum, Object... params) {
 		LevelScreen newScreen = screenEnum.setScreen(params);
 //		newScreen.buildStage(); //builds actors
