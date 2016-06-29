@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="10" tilewidth="32" tileheight="32" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="10" tilewidth="32" tileheight="32" nextobjectid="3">
  <tileset firstgid="1" name="magecity" tilewidth="32" tileheight="32" tilecount="360" columns="8">
   <image source="magecity.png" width="256" height="1450"/>
   <tile id="9">
@@ -85,4 +85,14 @@
 58,50,50,50,50,51,30,68,68,30,49,50,50,50,50,58
 </data>
  </layer>
+ <objectgroup name="Spawn">
+  <properties>
+   <property name="previousMap" value="map_1"/>
+  </properties>
+  <object id="2" x="224" y="224" width="32" height="32">
+   <properties>
+    <property name="previousMap" value="map_1"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

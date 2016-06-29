@@ -2,9 +2,9 @@ package com.mygdx.time.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -31,12 +31,7 @@ public class MainMenu implements Screen {
 	private TextButton buttonPlay, buttonExit;
 	private Label heading;
 	private TweenManager tweenManager;
-	private Texture catTexture = new Texture(Gdx.files.internal("img/kittenTransparent3.png"));
-	private Texture settingsTexture = new Texture(Gdx.files.internal("img/gear.png"));
-	private Image catImage = new Image(catTexture);
-	private Image catImage2 = new Image(catTexture);
-	private Image settingsImage = new Image(settingsTexture);
-	
+	private Image catImage, catImage2, settingsImage;
 	private boolean playClicked = false, exitClicked = false, settingsClicked = false;
 	private float fadeTimer = 0;
 	private float timer = 0;
@@ -44,9 +39,17 @@ public class MainMenu implements Screen {
 	@Override
 	public void show() {
 		 stage = new Stage(new ScreenViewport());
-		 
 		 Gdx.input.setInputProcessor(stage);
-		 skin = new Skin(Gdx.files.internal("ui/menuSkin.json"), new TextureAtlas("ui/atlas.pack"));
+
+		 
+		 TimeGame.assets.load("img/kittenTransparent3.png", Texture.class);
+		 TimeGame.assets.load("img/gear.png", Texture.class);
+		 TimeGame.assets.load("ui/menuSkin.json", Skin.class, new SkinLoader.SkinParameter("ui/atlas.pack"));
+		 TimeGame.assets.finishLoading();
+		 catImage = new Image(TimeGame.assets.get("img/kittenTransparent3.png", Texture.class));
+		 catImage2 = new Image(TimeGame.assets.get("img/kittenTransparent3.png", Texture.class));
+		 settingsImage = new Image(TimeGame.assets.get("img/gear.png", Texture.class));
+		 skin = TimeGame.assets.get("ui/menuSkin.json", Skin.class);
 		 
 		 //set music
 		 MusicManager.getInstance().setTransitionMusic(Gdx.files.internal("sound/castaway.mp3"), 6, 0.2f);
@@ -173,7 +176,6 @@ public class MainMenu implements Screen {
 		Gdx.gl.glClearColor(0,1,1,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		MusicManager.getInstance().update(delta);
 		tweenManager.update(delta);
 		
 		stage.act(delta);
@@ -195,13 +197,13 @@ public class MainMenu implements Screen {
 
 			fadeTimer += delta;
 			if(fadeTimer > 3){
-				 ((TimeGame) Gdx.app.getApplicationListener()).setScreen(new MapTwo());
+				 ((TimeGame) Gdx.app.getApplicationListener()).setScreen(new MapTwo("map_1", "map_2")); //TODO: make a default spawn location
 			}
 		}
 		
 		if(exitClicked){
-			MusicManager.getInstance().setFadeMusic(2);
 			if(fadeTimer == 0){
+				MusicManager.getInstance().setFadeMusic(2);
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
 			 	.push(Tween.to(catImage, ActorAccessor.ALPHA, 2f).target(0))
@@ -220,8 +222,8 @@ public class MainMenu implements Screen {
 		
 		
 		if(settingsClicked){
-			MusicManager.getInstance().setFadeMusic(2);
 			if(fadeTimer == 0){
+				MusicManager.getInstance().setFadeMusic(2);
 				Timeline.createParallel().beginParallel()
 			 	.push(Tween.to(heading, ActorAccessor.ALPHA, 2f).target(0))
 			 	.push(Tween.to(catImage, ActorAccessor.ALPHA, 2f).target(0))
@@ -268,8 +270,10 @@ public class MainMenu implements Screen {
 	@Override
 	public void dispose() {
 		stage.dispose();
-		skin.dispose();
-		catTexture.dispose();
+		TimeGame.assets.unload("img/kittenTransparent3.png");
+		TimeGame.assets.unload("img/gear.png");
+		TimeGame.assets.unload("ui/menuSkin.json");
+		
 	}
 
 }

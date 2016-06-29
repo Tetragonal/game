@@ -23,7 +23,7 @@ public class SettingsMenu implements Screen {
 	private Table table;
 	private Skin skin;
 
-	private static String file = "cat plant";
+	private static String file = "cat plant settings";
 	
 	/** @return the directory the levels will be saved to and read from */
 	public static FileHandle levelDirectory() {
@@ -39,12 +39,15 @@ public class SettingsMenu implements Screen {
 		return Gdx.app.getPreferences(file).getBoolean("vsync");
 	}
 
+	public static boolean mute(){
+		return Gdx.app.getPreferences(file).getBoolean("mute");
+	}
+	
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		MusicManager.getInstance().update(delta);
+		
 		stage.act(delta);
 		stage.draw();
 	}
@@ -73,6 +76,9 @@ public class SettingsMenu implements Screen {
 		final CheckBox vSyncCheckBox = new CheckBox(" vSync", skin);
 		vSyncCheckBox.setChecked(vSync());
 
+		final CheckBox muteCheckBox = new CheckBox(" Mute BGM", skin);
+		muteCheckBox.setChecked(mute());
+
 		final TextField levelDirectoryInput = new TextField(levelDirectory().path(), skin); // creating a new TextField with the current level directory already written in it
 		levelDirectoryInput.setMessageText("level directory"); // set the text to be shown when nothing is in the TextField
 
@@ -82,7 +88,7 @@ public class SettingsMenu implements Screen {
 		ClickListener buttonHandler = new ClickListener() {
 
 			@Override
-			public void clicked(InputEvent event, float x, float y) {
+			public void clicked(InputEvent event, float x, float y) {				
 				// event.getListenerActor() returns the source of the event, e.g. a button that was clicked
 				if(event.getListenerActor() == vSyncCheckBox) {
 					// save vSync
@@ -92,6 +98,9 @@ public class SettingsMenu implements Screen {
 					Gdx.graphics.setVSync(vSync());
 
 					Gdx.app.log(file, "vSync " + (vSync() ? "enabled" : "disabled"));
+				} else if(event.getListenerActor() == muteCheckBox){
+					Gdx.app.getPreferences(file).putBoolean("mute", muteCheckBox.isChecked());
+					MusicManager.isMuted = mute();
 				} else if(event.getListenerActor() == back) {
 					// save level directory
 					String actualLevelDirectory = levelDirectoryInput.getText().trim().equals("") ? Gdx.files.getExternalStoragePath() + file + "/levels" : levelDirectoryInput.getText().trim(); // shortened form of an if-statement: [boolean] ? [if true] : [else] // String#trim() removes spaces on both sides of the string
@@ -108,15 +117,19 @@ public class SettingsMenu implements Screen {
 		};
 
 		vSyncCheckBox.addListener(buttonHandler);
+		muteCheckBox.addListener(buttonHandler);
 		back.addListener(buttonHandler);
 		
 		// putting everything in the table
 		table.add(new Label("SETTINGS (unfinished)", skin)).spaceBottom(50).colspan(3).expandX().row();
 		table.add();
-		table.add("level directory");
+		table.add("level directory (ignore this for now)");
 		table.add().row();
-		table.add(vSyncCheckBox).top().expandY();
-		table.add(levelDirectoryInput).top().fillX();
+		table.add(vSyncCheckBox).top().left().padLeft(50);
+		table.add(levelDirectoryInput).top().fillX().row();
+		table.add(muteCheckBox).top().left().padLeft(50).expandY().row();
+		table.add();
+		table.add();
 		table.add(back).bottom().right();
 
 		stage.addActor(table);

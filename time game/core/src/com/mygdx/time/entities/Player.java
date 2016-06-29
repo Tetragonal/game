@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,9 +23,11 @@ import com.mygdx.time.screens.LevelScreen;
 
 public class Player extends Actor{
 	
+	//TODO: extend Entity.java
+	
 	Sprite sprite = new Sprite(new Texture("img/kittenTransparent3.png")); //even x even pixels or the collision bugs out
 
-	private float maxSpeed = 120*2f; //60*2
+	private float maxSpeed = 80*2f; //60*2
 	private String blockedKey = "blocked";
 	private String warpKey = "warp";
 	private TiledMapTileLayer collisionLayer;
@@ -32,8 +35,7 @@ public class Player extends Actor{
 	private Sound tpSound = Gdx.audio.newSound(Gdx.files.internal("sound/warp2.ogg"));
 	
 	private Vector3 worldCoordinates = new Vector3();
-	private Vector2 location = new Vector2();
-	private Vector2 centerPosition = new Vector2();
+	public Vector2 location = new Vector2();
 	private Vector2 worldDestination = new Vector2();
 	private Vector2 direction = new Vector2();
 
@@ -44,8 +46,6 @@ public class Player extends Actor{
 	public float ghostX;
 	public float ghostY;
 	private int rewindSpot;
-	public float cameraX = 0;
-	public float cameraY = 0;
 	private Cell cell;
 	
 	public final int WARP_SECONDS = 3;
@@ -56,16 +56,22 @@ public class Player extends Actor{
 	
 	ArrayList<float[]> positionLog = new ArrayList<float[]>();
 	
+	public boolean acceptInput = true;
+	
 	private float mouseAngle;
+	
+	private float maxHealth = 5000;
+	private float health;
 	
 	public Player(TiledMapTileLayer collisionLayer, float x, float y){
 		setBounds(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight());
 		setTouchable(Touchable.enabled);
 		location.set(x,y);
-		
 		worldDestination.set(x+sprite.getWidth()/2, y+sprite.getHeight()/2);
 		
 		walkSound.setVolume(0.2f);
+		
+		health = maxHealth;
 		
 		this.collisionLayer = collisionLayer;
 		walkSound.setLooping(true);
@@ -86,7 +92,10 @@ public class Player extends Actor{
 	
 	public void act(float delta){
 		secondTimer += delta;
-		handleInput(delta);
+		if(acceptInput == true){
+			handleInput(delta);
+		}
+
 		playWalkSound();
 		move(delta);
 		handlePositionLog(delta);
@@ -95,9 +104,7 @@ public class Player extends Actor{
 		checkWarp(location.x+sprite.getWidth(), location.y);
 		checkWarp(location.x-1, location.y-1);
 	}
-	
-	//-------------------------------------------------------------------
-	
+
 	public void checkWarp(float x, float y){
 		cell = collisionLayer.getCell((int)(x/collisionLayer.getTileWidth()), (int)(y/collisionLayer.getTileHeight()));
 		if(cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(warpKey)){
@@ -130,9 +137,6 @@ public class Player extends Actor{
 						secondTimer = 0;
 						tp = false;
 					}
-				}else if(Math.abs(positionLog.get(i)[4]-secondTimer+.5) < .02){
-					cameraX = positionLog.get(i)[0]+sprite.getWidth()/2;
-					cameraY = positionLog.get(i)[1]+sprite.getHeight()/2;
 				}
 			}
 		}
@@ -163,13 +167,12 @@ public class Player extends Actor{
 	        			inputTimer = 0;
 	        		}
 	            	lmbHeldDown = true;
-	            	centerPosition.set(getX()+sprite.getWidth()/2, getY()+sprite.getHeight()/2);
 	
 	        	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
 	        	    getStage().getCamera().unproject(worldCoordinates);
 	
 	        	    worldDestination.set(worldCoordinates.x, worldCoordinates.y);
-	        	    direction.set(worldDestination.x-centerPosition.x, worldDestination.y-centerPosition.y);
+	        	    direction.set(worldDestination.x-(sprite.getX()+sprite.getWidth()/2), worldDestination.y-(sprite.getY()+sprite.getHeight()/2));
 	        	    mouseAngle  = direction.angle();
 	        	}
         	}
@@ -295,4 +298,25 @@ public class Player extends Actor{
 		}
 		return false;
 	}
+
+	public Rectangle getRectangle() { //idk if useful
+		return new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+	}
+	
+	public void takeDamage(float damage){
+		health -= damage;
+	}
+	
+	public void heal(float healing){
+		health += healing;
+	}
+	
+	public float getHealth(){
+		return health;
+	}
+	
+	public float getMaxHealth(){
+		return maxHealth;
+	}
+	
 }

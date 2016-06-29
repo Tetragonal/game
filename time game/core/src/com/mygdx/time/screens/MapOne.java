@@ -2,6 +2,10 @@ package com.mygdx.time.screens;
 
 public class MapOne extends LevelScreen{
 
+	public MapOne(String previousMap, String currentLevel) {
+		super(previousMap, currentLevel);
+	}
+
 	public void show(){
 		mapFile = "map/test map.tmx";
 		musicFile = "sound/fourseasons.mp3";

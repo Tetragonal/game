@@ -3,6 +3,7 @@ package com.mygdx.time.manager;
 import com.badlogic.gdx.Gdx;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.screens.LevelScreen;
+import com.mygdx.time.screens.LevelScreenEnum;
 
 public class LevelScreenManager {
 	
@@ -23,8 +24,8 @@ public class LevelScreenManager {
 	}
 	
 	/** Sets screen by searching through the enum for the keyword. */
-	public void setScreen(LevelScreenEnum screenEnum, Object... params) {
-		LevelScreen newScreen = screenEnum.setScreen(params);
+	public void setScreen(String mapName, String previousScreen) {
+		LevelScreen newScreen = LevelScreenEnum.valueOf(mapName).setScreen(previousScreen);
 //		newScreen.buildStage(); //builds actors
 		((TimeGame)Gdx.app.getApplicationListener()).setScreen(newScreen);
 	}

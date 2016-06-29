@@ -35,6 +35,6 @@
 		"default": 	{ "font": black, "fontColor": black, "messageFontColor": gray, "background": "color.white", "cursor": "color.black", selection: "color.blueTranslucent" }
 	},
 	"com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
-		"default": 	{ "titleFont": black, "background": "color.white" }
+		"default": 	{ "titleFont": black, "background": "color.white", "stageBackground": color.blackTranslucent}
 	}
 }

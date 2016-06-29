@@ -1,6 +1,9 @@
 package com.mygdx.time;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
@@ -8,12 +11,15 @@ import com.mygdx.time.screens.Splash;
 
 public class TimeGame extends Game {
 	
-	public SpriteBatch batch;
+	public static SpriteBatch batch;
+	public static final AssetManager assets = new AssetManager();
 	
 	@Override
 	public void create() {
 		LevelScreenManager.getInstance();
 		MusicManager.getInstance();
+		
+		Texture.setAssetManager(assets);
 		
 		batch = new SpriteBatch();
 		setScreen(new Splash());
@@ -27,7 +33,9 @@ public class TimeGame extends Game {
 
 	@Override
 	public void render() {
+		assets.update();
 		super.render();
+		MusicManager.getInstance().update(Gdx.graphics.getDeltaTime());
 	}
 
 	@Override
@@ -45,6 +53,6 @@ public class TimeGame extends Game {
 		super.dispose();
 		MusicManager.getInstance().dispose();
 		batch.dispose();
-	}
-
+		assets.dispose();
+	}	
 }
