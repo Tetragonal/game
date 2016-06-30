@@ -21,66 +21,47 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mygdx.time.screens.LevelScreen;
 
-public class Player extends Actor{
+public class Player extends Mob{
 	
-	//TODO: extend Entity.java
-	
-	Sprite sprite = new Sprite(new Texture("img/kittenTransparent3.png")); //even x even pixels or the collision bugs out
-
 	private float maxSpeed = 80*2f; //60*2
 	private String blockedKey = "blocked";
 	private String warpKey = "warp";
-	private TiledMapTileLayer collisionLayer;
 	public Music walkSound = Gdx.audio.newMusic(Gdx.files.internal("sound/walksound.mp3"));
 	private Sound tpSound = Gdx.audio.newSound(Gdx.files.internal("sound/warp2.ogg"));
 	
 	private Vector3 worldCoordinates = new Vector3();
-	public Vector2 location = new Vector2();
-	private Vector2 worldDestination = new Vector2();
-	private Vector2 direction = new Vector2();
 
+	public float secondTimer = 0;
 	private boolean lmbHeldDown = false;
 	private float inputTimer = 0;
-	public float secondTimer = 0;
+	private float mouseAngle;
 	
 	public float ghostX;
 	public float ghostY;
 	private int rewindSpot;
-	private Cell cell;
 	
 	public final int WARP_SECONDS = 3;
 	
-	private boolean tp = false;
-	
-	public String warpDestination;
+	private boolean canTeleport = false;
 	
 	ArrayList<float[]> positionLog = new ArrayList<float[]>();
 	
+	public String warpDestination;
 	public boolean acceptInput = true;
 	
-	private float mouseAngle;
 	
-	private float maxHealth = 5000;
-	private float health;
-	
-	public Player(TiledMapTileLayer collisionLayer, float x, float y){
-		setBounds(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight());
-		setTouchable(Touchable.enabled);
-		location.set(x,y);
-		worldDestination.set(x+sprite.getWidth()/2, y+sprite.getHeight()/2);
+
+	public Player(TiledMapTileLayer collisionLayer, float x, float y, Texture texture){
+		super(collisionLayer, x, y, texture);
 		
 		walkSound.setVolume(0.2f);
-		
-		health = maxHealth;
-		
-		this.collisionLayer = collisionLayer;
 		walkSound.setLooping(true);
 		
 		addListener(new InputListener(){
 			@Override
 			public boolean keyDown(InputEvent event, int keycode){
 				if(keycode == Input.Keys.Z && secondTimer > WARP_SECONDS){
-					tp = true;
+					canTeleport = true;
 				}
 				return true;
 			}
@@ -115,7 +96,6 @@ public class Player extends Actor{
 	public void disposeAssets(){
 		walkSound.dispose();
 		tpSound.dispose();
-		sprite.getTexture().dispose();
 	}
 	
 	public void handlePositionLog(float delta){
@@ -125,7 +105,7 @@ public class Player extends Actor{
 					ghostX = positionLog.get(i)[0]+sprite.getWidth()/2;
 					ghostY = positionLog.get(i)[1]+sprite.getHeight()/2;	
 					rewindSpot = i;
-					if(tp == true){
+					if(canTeleport == true){
 						tpSound.play();
 						location.x = positionLog.get(rewindSpot)[0];
 						location.y = positionLog.get(rewindSpot)[1];							
@@ -135,7 +115,7 @@ public class Player extends Actor{
 						worldDestination.y = location.y+sprite.getHeight()/2;
 						positionLog.clear();
 						secondTimer = 0;
-						tp = false;
+						canTeleport = false;
 					}
 				}
 			}
@@ -298,25 +278,4 @@ public class Player extends Actor{
 		}
 		return false;
 	}
-
-	public Rectangle getRectangle() { //idk if useful
-		return new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-	}
-	
-	public void takeDamage(float damage){
-		health -= damage;
-	}
-	
-	public void heal(float healing){
-		health += healing;
-	}
-	
-	public float getHealth(){
-		return health;
-	}
-	
-	public float getMaxHealth(){
-		return maxHealth;
-	}
-	
 }

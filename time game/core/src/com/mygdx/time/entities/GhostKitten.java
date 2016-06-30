@@ -3,7 +3,7 @@ package com.mygdx.time.entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
-public class GhostKitten extends Entity{
+public class GhostKitten extends Mob{
 
 	private Player attachedPlayer;
 	
@@ -12,7 +12,6 @@ public class GhostKitten extends Entity{
 		this.attachedPlayer = attachedPlayer;
 	}
 	
-	@Override
 	public void act(float delta){
 		this.setPosition(attachedPlayer.ghostX-this.getWidth()/2, attachedPlayer.ghostY-this.getHeight()/2);
 	}

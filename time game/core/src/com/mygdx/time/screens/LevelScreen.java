@@ -30,6 +30,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.entities.WanderingEnemy;
+import com.mygdx.time.entities.AggroEnemyTest;
 import com.mygdx.time.entities.EnemyEnum;
 import com.mygdx.time.entities.Entity;
 import com.mygdx.time.entities.GhostKitten;
@@ -69,7 +71,6 @@ public abstract class LevelScreen implements Screen{
 	private Group entities = new Group();
 	private Player player;
 	private GhostKitten ghostKitten;
-//	private Texture ghost = new Texture(Gdx.files.internal("img/kittenTransparentBlue.png"));
 	
 	public static final int CAMERA_OFFSET_X = 0;	
 	
@@ -88,8 +89,10 @@ public abstract class LevelScreen implements Screen{
 		TimeGame.assets.load("temp inventory resources/icons/icons.atlas", TextureAtlas.class); //temporary inventory
 		TimeGame.assets.load("ui/menuSkin.json", Skin.class, new SkinLoader.SkinParameter("ui/atlas.pack")); //ui config
 
+		TimeGame.assets.load("img/kittenTransparent3.png", Texture.class); //player
 		TimeGame.assets.load(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile(), Texture.class); //temp sprite loading
 		TimeGame.assets.load(EnemyEnum.valueOf("GHOST_KITTEN").getTextureFile(), Texture.class);
+		TimeGame.assets.load("img/laser.png", Texture.class); //projectile
 		
 		TimeGame.assets.load("img/kittenTransparentBlue.png", Texture.class); //ghost texture
 		
@@ -120,11 +123,13 @@ public abstract class LevelScreen implements Screen{
 				startY = rectangleObject.getRectangle().y;
 			}
 		}
-		player = new Player(collisionLayer,startX, startY);
+		player = new Player(collisionLayer,startX, startY, TimeGame.assets.get("img/kittenTransparent3.png"));
 		ghostKitten = new GhostKitten(collisionLayer,startX, startY, TimeGame.assets.get(EnemyEnum.valueOf("GHOST_KITTEN").getTextureFile()), player);
-		Entity testEntity = new Entity(collisionLayer,startX+50, startY, TimeGame.assets.get(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile()));
+		WanderingEnemy testEnemy = new WanderingEnemy(collisionLayer,startX+50, startY, TimeGame.assets.get(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile()));
+		AggroEnemyTest testEnemy2 = new AggroEnemyTest(collisionLayer,startX-50, startY, TimeGame.assets.get(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile()));
 		entities.addActor(ghostKitten);
-		entities.addActor(testEntity);
+		entities.addActor(testEnemy);
+		entities.addActor(testEnemy2);
 		entities.addActor(player);
 		stage.setKeyboardFocus(player);	
 		
@@ -174,6 +179,12 @@ public abstract class LevelScreen implements Screen{
 		}else {
 			player.walkSound.pause();
 			inventoryWindow.setVisible(false);
+		}
+		
+		if(player.getHealth() <=0){
+			player.disposeAssets();
+			player.remove();
+			ghostKitten.remove();
 		}
 		
 		//center camera on player
@@ -251,7 +262,6 @@ public abstract class LevelScreen implements Screen{
 	@Override
 	public void dispose() {
 		player.disposeAssets();
-//		map.dispose();
 		TimeGame.assets.unload(mapFile);
 		renderer.dispose();
 		
@@ -261,11 +271,13 @@ public abstract class LevelScreen implements Screen{
 		font.dispose(); //temporary
 		shapeRenderer.dispose(); //temporary
 		
+		TimeGame.assets.unload("img/laser.png"); //projectile
+		TimeGame.assets.unload("img/kittenTransparent3.png"); //player
 		TimeGame.assets.unload("ui/menuSkin.json"); //crappy ui
 		TimeGame.assets.unload("temp inventory resources/skins/uiskin.json"); //temporary inventory
 		TimeGame.assets.unload("temp inventory resources/icons/icons.atlas"); //temporary inventory
-		TimeGame.assets.load(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile(), Texture.class); //temp sprite loading
-		TimeGame.assets.load(EnemyEnum.valueOf("GHOST_KITTEN").getTextureFile(), Texture.class);
+		TimeGame.assets.unload(EnemyEnum.valueOf("BLUE_SLIME").getTextureFile()); //temp sprite loading
+		TimeGame.assets.unload(EnemyEnum.valueOf("GHOST_KITTEN").getTextureFile());
 		
 	}
 	
@@ -279,8 +291,11 @@ public abstract class LevelScreen implements Screen{
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             player.takeDamage(5);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.getHealth() > 0) {
             player.heal(5);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            player.rotateBy(1);
         }
         camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 1000/camera.viewportWidth);
 	}
