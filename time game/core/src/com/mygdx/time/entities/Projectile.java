@@ -1,28 +1,30 @@
 package com.mygdx.time.entities;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.time.screens.KinematicEntity;
 
-public class Projectile extends CollidibleEntity{
+public class Projectile extends KinematicEntity{
 
 	private float damage;
-	private float angleDeg;
+	private float duration;
+	private float timer = 0;
 	
-	public Projectile(TiledMapTileLayer collisionLayer, float x, float y, float damage, float speed, float angleDeg, Texture texture) {
-		super(collisionLayer, x, y, texture);
-		this.debug();
+	public Projectile(MapLayer collisionLayer, float x, float y, float damage, float speed, float angleDeg, float duration, Texture texture, World world, String name) {
+		super(collisionLayer, x, y, texture, world, name);
 		this.damage = damage;
-		this.angleDeg = angleDeg;
-		
+		this.duration = duration;
 		maxSpeed = speed;
+		body.setBullet(true);
 		worldDestination.set(x+100000*MathUtils.cosDeg(angleDeg), y+100000*MathUtils.sinDeg(angleDeg));
-		
-//		sprite.setOrigin(getWidth()/2,getHeight()/2);
 		sprite.setOrigin(0, sprite.getHeight()/2);
 		sprite.rotate(angleDeg);
 		setOriginY(getHeight()/2);
 		rotateBy(angleDeg);
+		body.setTransform(x, y, angleDeg*MathUtils.degreesToRadians);
+		body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(angleDeg), maxSpeed*MathUtils.sinDeg(angleDeg));
 		
 	}
 
@@ -32,10 +34,16 @@ public class Projectile extends CollidibleEntity{
 	
 	@Override
 	public void act(float delta){
-		if(collidesTop() || collidesBottom() || collidesLeft() || collidesRight()){
+	    body.setFixedRotation(false);
+		timer += delta;
+		if(timer > duration){
+	          world.destroyBody(body);
+	            body.setUserData(null);
+	            body = null;
 			this.remove();
+		}else{
+			super.act(delta);
 		}
-		super.act(delta);
 	}
 
 }

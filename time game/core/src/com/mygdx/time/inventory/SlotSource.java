@@ -54,7 +54,7 @@ public class SlotSource extends Source {
 		sourceSlot.take(sourceSlot.getAmount());
 		payload.setObject(payloadSlot);
 
-		TextureAtlas icons = TimeGame.assets.get("temp inventory/icons/icons.atlas", TextureAtlas.class);
+		TextureAtlas icons = TimeGame.assets.get("temp inventory resources/icons/icons.atlas", TextureAtlas.class);
 		TextureRegion icon = icons.findRegion(payloadSlot.getItem().getTextureRegion());
 
 		Actor dragActor = new Image(icon);

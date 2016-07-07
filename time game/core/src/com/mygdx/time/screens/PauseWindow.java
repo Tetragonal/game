@@ -18,7 +18,7 @@ public class PauseWindow extends Window {
 	public PauseWindow(Skin skin){
 		super("", skin);
 		this.skin = skin;
-		
+		skin.getFont("black").getData().setScale(0.5f);
 		TextButton resumeButton = new TextButton("Resume", skin);
 		TextButton exitButton = new TextButton("Quit", skin);
 		TextButton menuButton = new TextButton("Menu", skin);
