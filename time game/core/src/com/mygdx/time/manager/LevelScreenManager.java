@@ -25,8 +25,8 @@ public class LevelScreenManager {
 	
 	/** Sets screen by searching through the enum for the keyword. */
 	public void setScreen(String mapName, String previousScreen) {
+		System.out.println(mapName + " " + previousScreen);
 		LevelScreen newScreen = LevelScreenEnum.valueOf(mapName).setScreen(previousScreen);
-//		newScreen.buildStage(); //builds actors
 		((TimeGame)Gdx.app.getApplicationListener()).setScreen(newScreen);
 	}
 }

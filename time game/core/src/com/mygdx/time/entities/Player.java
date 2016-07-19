@@ -8,15 +8,14 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.mygdx.time.TimeGame;
-import com.mygdx.time.screens.LevelScreen;
+import com.mygdx.time.map.Game;
+import com.mygdx.time.screens.GameStage;
 
 public class Player extends Mob{
 	
@@ -32,21 +31,22 @@ public class Player extends Mob{
 	public float ghostX;
 	public float ghostY;
 	private int rewindSpot;
-	public final int WARP_SECONDS = 3;
+	public final int WARP_SECONDS = 2;
 	private boolean canTeleport = false;
 	private ArrayList<float[]> positionLog = new ArrayList<float[]>();
+	private float testProjSpawn = 0;
+	private float testProj2Refill = 0;
+	private float testProj2Count = 5;
+	private float testProj2Delay = 0;
+	private float testProj2FireAngle;
+	private boolean testProj2Boolean = false;
 	
-	public String warpDestination;
-	TiledMapTileLayer warpLayer;
-	
-	public Player(MapLayer collisionLayer, float x, float y, Texture texture, World world, String name){
-		super(collisionLayer, x, y, texture, world, name);
-		
+	public Player(float x, float y, Texture texture, GameStage gameStage, String entityName){
+		super(x, y, texture, gameStage, entityName, false);
 		walkSound = TimeGame.assets.get("sound/walksound.mp3");
 		tpSound = TimeGame.assets.get("sound/warp2.ogg");
 		walkSound.setVolume(0.2f);
 		walkSound.setLooping(true);
-		
 		addListener(new InputListener(){
 			@Override
 			public boolean keyDown(InputEvent event, int keycode){
@@ -56,14 +56,17 @@ public class Player extends Mob{
 				return true;
 			}
 		});
-		
 		ghostX = x+sprite.getWidth()/2;
 		ghostY = y+sprite.getHeight()/2;
 		
+		
+		for(int i=0; i<body.getFixtureList().size; i++){
+		body.getFixtureList().get(i).getFilterData().maskBits = Game.CATEGORY_NONCOLLIDABLE;
+		body.getFixtureList().get(i).getFilterData().categoryBits = Game.CATEGORY_ALLY;
+		}
 	}
 	
 	public void act(float delta){
-//		location.set(getX(), getY());
 		secondTimer += delta;
 		if(acceptInput == true){
 			handleInput(delta);
@@ -71,34 +74,40 @@ public class Player extends Mob{
 		super.act(delta);
 		playWalkSound();
 		handlePositionLog(delta);
-//		checkWarp(location.x+sprite.getWidth(), location.y+sprite.getHeight());
-//		checkWarp(location.x, location.y+sprite.getHeight());
-//		checkWarp(location.x+sprite.getWidth(), location.y);
-//		checkWarp(location.x-1, location.y-1);
-	}
+		
+		testProj2Refill += delta;
+		while(testProj2Refill > .2){
+			testProj2Refill -= .2;
+			testProj2Count++;
+			testProj2Count = MathUtils.clamp(testProj2Count, 0, 5);
+		}
 
-	public void checkWarp(float x, float y){ //TODO re-implement warp
-//		cell = ((TiledMapTileLayer)collisionLayer).getCell((int)(x/((TiledMapTileLayer)collisionLayer).getTileWidth()), (int)(y/((TiledMapTileLayer)collisionLayer).getTileHeight()));
-//		if(cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey("warp")){
-//			warpDestination = (String) cell.getTile().getProperties().get("warp");
-//		}
+ 	    if(testProj2Boolean == true && testProj2Count > 0){
+ 	    	testProj2Delay += delta;
+ 	    	if(testProj2Delay > .05){
+ 	    		fireProjectile(0,0,5,10,testProj2FireAngle, TimeGame.assets.get("img/laser2.png"), gameStage);
+ 	    		testProj2Delay = 0;
+ 				testProj2Count--;
+ 	    	}
+ 	    }else{
+ 	    	testProj2Boolean = false;
+ 	    }
 	}
 	
 	public void handlePositionLog(float delta){
 		if(secondTimer > WARP_SECONDS){
 			for(int i=0; i< positionLog.size(); i++){
-				if(Math.abs(positionLog.get(i)[4]-secondTimer+WARP_SECONDS) < .02){
+				if(Math.abs(positionLog.get(i)[2]-secondTimer+WARP_SECONDS) < .02){
 					ghostX = positionLog.get(i)[0]+sprite.getWidth()/2;
 					ghostY = positionLog.get(i)[1]+sprite.getHeight()/2;	
 					rewindSpot = i;
 					if(canTeleport == true){
 						tpSound.play();
-						location.set(positionLog.get(rewindSpot)[0], positionLog.get(rewindSpot)[1]);
-						setX(positionLog.get(rewindSpot)[2]);
-						setY(positionLog.get(rewindSpot)[3]);
-						worldDestination.x = location.x+sprite.getWidth()/2;
-						worldDestination.y = location.y+sprite.getHeight()/2;
-						body.setTransform(positionLog.get(rewindSpot)[2], positionLog.get(rewindSpot)[3], 0);
+						setX(positionLog.get(rewindSpot)[0]);
+						setY(positionLog.get(rewindSpot)[1]);
+						worldDestination.x = body.getPosition().x + body.getLocalCenter().x;
+						worldDestination.y = body.getPosition().y + body.getLocalCenter().y;
+						body.setTransform(positionLog.get(rewindSpot)[0], positionLog.get(rewindSpot)[1], 0);
 						body.setLinearVelocity(0, 0);
 						positionLog.clear();
 						secondTimer = 0;
@@ -107,8 +116,8 @@ public class Player extends Mob{
 				}
 			}
 		}
-		positionLog.add(new float[]{location.x,location.y,getX(),getY(),secondTimer});
-		while(positionLog.get(0)[4] < secondTimer-10){
+		positionLog.add(new float[]{getX(),getY(),secondTimer});
+		while(positionLog.get(0)[2] < secondTimer-10){
 			positionLog.remove(0);
 		}
 	}
@@ -126,9 +135,10 @@ public class Player extends Mob{
 	
 	public void handleInput(float delta){
 		inputTimer+= delta;
+		testProjSpawn += delta;
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-LevelScreen.CAMERA_OFFSET_X || lmbHeldDown == true)){
-	        	if(lmbHeldDown == false || inputTimer > .2 || Math.abs(location.y-worldDestination.y+sprite.getHeight()/2) < 1  || Math.abs(location.x-worldDestination.x+sprite.getWidth()/2) < 1){
+        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-Game.CAMERA_OFFSET_X || lmbHeldDown == true)){
+	        	if(lmbHeldDown == false || inputTimer > .2 || Math.abs(getY()-worldDestination.y+sprite.getHeight()/2) < 1  || Math.abs(getX()-worldDestination.x+sprite.getWidth()/2) < 1){
 	        		if(inputTimer > .2)
 	        		{
 	        			inputTimer = 0;
@@ -139,26 +149,45 @@ public class Player extends Mob{
 	        	    getStage().getCamera().unproject(worldCoordinates);
 	
 	        	    worldDestination.set(worldCoordinates.x, worldCoordinates.y);
-	        	    direction.set(worldDestination.x-(sprite.getX()+sprite.getWidth()/2), worldDestination.y-(sprite.getY()+sprite.getHeight()/2));
+	        	    direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
 	        	    moveAngle  = direction.angle();
 	        	    body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(moveAngle), maxSpeed*MathUtils.sinDeg(moveAngle));
 	        	}
         	}
         }else lmbHeldDown = false;
+        if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
+    	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
+    	    getStage().getCamera().unproject(worldCoordinates);
+    	    float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
+    		if(testProjSpawn > .25){
+    			for(int i=0; i<5; i++){
+        			fireProjectile(0,0,10,10,fireAngle-12+i*6, TimeGame.assets.get("img/laser2.png"), gameStage);
+    			}
+    			testProjSpawn = 0;
+    		}
+    	}
+        if(Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)){
+ 			if(testProj2Count >= 5){
+ 				worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
+ 		 	    getStage().getCamera().unproject(worldCoordinates);
+ 		 	    testProj2FireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
+				testProj2Boolean = true;
+			}
+    			
+    	}
+	}
+	
+    @Override
+	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, Texture texture, GameStage gameStage){
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 5, texture, gameStage, "AllyLaser");
+		getStage().addActor(projectile);
 	}
 	
 	private void playWalkSound(){
-//		if(((Math.abs(location.y-worldDestination.y+sprite.getHeight()/2) >= 1)) || (Math.abs(location.x-worldDestination.x+sprite.getWidth()/2) >= 1) && !walkSound.isPlaying()){
-//			walkSound.play();
-//		}else if((Math.abs(location.y-worldDestination.y+sprite.getHeight()/2) < 1) && (Math.abs(location.x-worldDestination.x+sprite.getWidth()/2) < 1  && walkSound.isPlaying())){
-//			walkSound.pause();
-//		}
-		
 		if(body.getLinearVelocity().x != 0 && body.getLinearVelocity().y != 0 && !walkSound.isPlaying()){
 			walkSound.play();
 		}else if (body.getLinearVelocity().x == 0 && body.getLinearVelocity().y == 0 && walkSound.isPlaying()){
 			walkSound.pause();
 		}
-		
 	}
 }

@@ -12,6 +12,9 @@ public enum LevelScreenEnum {
 	},
 	map_3 {
 		public LevelScreen setScreen(String previousMap) { return new MapThree(previousMap, "map_3"); }
+	},
+	Sandbox {
+		public LevelScreen setScreen(String previousMap) { return new MapThree(previousMap, "Sandbox"); }
 	}
 	;
 	

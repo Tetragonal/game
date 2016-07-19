@@ -1,35 +1,38 @@
 package com.mygdx.time.entities;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.time.screens.KinematicEntity;
+import com.mygdx.time.screens.GameStage;
 
 public class Mob extends PhysicsEntity{
 	
 	private int health;
 	private int maxHealth = 500;
+	MobHealthBar mobHealthBar = null;
 	
-	public Mob(MapLayer collisionLayer, float x, float y, Texture texture, String name) {
-		super(collisionLayer, x, y, texture, name);
+	public Mob(float x, float y, Texture texture, String entityName, boolean isAirborne) {
+		super(x, y, texture, entityName);
+		worldDestination.set(x+sprite.getWidth()/2, y+sprite.getHeight()/2);
 		health = maxHealth;
 	}
-	public Mob(MapLayer collisionLayer, float x, float y, Texture texture, World world, String name) {
-		super(collisionLayer, x, y, texture, name);
-		health = maxHealth;
-		createBody(x, y, world);
+	public Mob(float x, float y, Texture texture, GameStage gameStage, String entityName, boolean isAirborne) {
+		this(x, y, texture, entityName, isAirborne);
+		this.gameStage = gameStage;
+		createBody(x, y, gameStage.getWorld());
 	}
 	
-	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, Texture texture, World world){
-		Projectile projectile = new Projectile(collisionLayer, getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, texture, world, "laser");
+	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, Texture texture, GameStage gameStage){
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, texture, gameStage, "EnemyLaser");
 		getStage().addActor(projectile);
 	}
 	
 	@Override
 	public void act(float delta){
+		if(mobHealthBar == null){
+			mobHealthBar = new MobHealthBar(body.getPosition().x, body.getPosition().y-sprite.getHeight() +1, this);
+		}
 		super.act(delta);
 		if(health <= 0){
-			isFlaggedForDelete = true;
+			flagForDelete();
 		}
 	}
 	
@@ -49,4 +52,7 @@ public class Mob extends PhysicsEntity{
 		return maxHealth;
 	}
 
+	public float getHealthPercent(){
+		return health*1f/maxHealth;
+	}
 }

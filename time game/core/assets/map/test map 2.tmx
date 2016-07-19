@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="10" tilewidth="32" tileheight="32" nextobjectid="56">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="10" tilewidth="32" tileheight="32" nextobjectid="61">
  <tileset firstgid="1" name="magecity" tilewidth="32" tileheight="32" tilecount="360" columns="8">
   <image source="magecity.png" width="256" height="1450"/>
   <tile id="9">
@@ -85,7 +85,7 @@
 0,0,0,0,0,0,30,68,68,30,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="Spawn / Warp" visible="0">
+ <objectgroup name="Spawn / Warp">
   <properties>
    <property name="previousMap" value="map_1"/>
   </properties>
@@ -100,7 +100,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="Collision (grounded)">
+ <objectgroup name="Collision (grounded)" visible="0">
   <object id="11" x="195.25" y="300.375" width="24.5" height="17.625"/>
   <object id="12" x="291.5" y="300.75" width="24.5" height="17.625"/>
   <object id="36" x="0" y="0" width="32" height="320"/>
@@ -110,11 +110,9 @@
   <object id="42" x="480" y="32" width="32" height="256"/>
  </objectgroup>
  <objectgroup name="Collision (aerial)" visible="0">
-  <object id="24" x="194.938" y="318.062">
-   <polygon points="0,0 0,-18.1562 4.15625,-18.0312 4.0625,-30.25 21.0938,-30.1875 21.0625,-18.1562 25.125,-18.125 25.0938,-0.09375"/>
-  </object>
-  <object id="25" x="291.062" y="318.188">
-   <polygon points="0,0 0,-18.1562 4.15625,-18.0312 4.0625,-30.25 21.0938,-30.1875 21.0625,-18.1562 25.125,-18.125 25.0938,-0.09375"/>
-  </object>
+  <object id="57" x="291.091" y="300.182" width="24.9091" height="17.8182"/>
+  <object id="58" x="294.364" y="287.636" width="18" height="12.3636"/>
+  <object id="59" x="195.091" y="300.182" width="24.9091" height="17.8182"/>
+  <object id="60" x="198.364" y="287.636" width="18" height="12.3636"/>
  </objectgroup>
 </map>

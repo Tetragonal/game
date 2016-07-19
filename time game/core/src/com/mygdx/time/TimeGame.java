@@ -7,8 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
-import com.mygdx.time.screens.MapTwo;
-import com.mygdx.time.screens.Splash;
+import com.mygdx.time.screens.MapOne;
 
 public class TimeGame extends Game {
 	
@@ -23,7 +22,9 @@ public class TimeGame extends Game {
 		Texture.setAssetManager(assets);
 		
 		batch = new SpriteBatch();
-		setScreen(new MapTwo("map_1", "map_2"));
+//		setScreen(new Sandbox("map_1", "Sandbox"));
+//		setScreen(new MapTwo("map_1", "map_2"));
+		setScreen(new MapOne("map_2", "map_1"));
 	}
 
 	@Override
