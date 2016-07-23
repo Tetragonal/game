@@ -1,7 +1,6 @@
 package com.mygdx.time.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -31,24 +30,24 @@ public class GameStage extends Stage{
 	}
 	
 	public Player addPlayer(){
-		Player player = new Player(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, TimeGame.assets.get("img/kittenTransparent3.png"), this, "Player");
+		Player player = new Player(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, this, "PLAYER");
 		return player;
 	}
 	
 	public GhostKitten addGhostKitten(Player attachedPlayer){
-		GhostKitten ghostKitten = new GhostKitten(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, TimeGame.assets.get(EntityEnum.valueOf("GHOST_KITTEN").getTextureFile()), attachedPlayer, this, EntityEnum.valueOf("GHOST_KITTEN").getPhysicsName());
+		GhostKitten ghostKitten = new GhostKitten(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, attachedPlayer, this, "GHOST_KITTEN");
 		addActor(ghostKitten);
 		return ghostKitten;
 	}
 	
-	public WanderingEnemy addWanderingEntity(float x, float y, String mobName){
-		WanderingEnemy wanderingEntity = new WanderingEnemy(x, y, getTexture(mobName), this, getPhysicsName(mobName), isAirborne(mobName));
+	public WanderingEnemy addWanderingEntity(float x, float y, String entityName){
+		WanderingEnemy wanderingEntity = new WanderingEnemy(x, y, this, entityName, isAirborne(entityName));
 		addActor(wanderingEntity);
 		return wanderingEntity;
 	}
 
-	public AggroEnemyTest addAggroEnemyTest(float x, float y, String mobName) {
-		AggroEnemyTest aggroEnemyTest = new AggroEnemyTest(x, y, getTexture(mobName), this, getPhysicsName(mobName), isAirborne(mobName));
+	public AggroEnemyTest addAggroEnemyTest(float x, float y, String entityName) {
+		AggroEnemyTest aggroEnemyTest = new AggroEnemyTest(x, y, this, entityName, isAirborne(entityName));
 		addActor(aggroEnemyTest);
 		return aggroEnemyTest;
 		
@@ -56,14 +55,6 @@ public class GameStage extends Stage{
 
 	public BodyEditorLoader getLoader(){
 		return loader;
-	}
-	
-	public Texture getTexture(String entityName){
-		return TimeGame.assets.get(EntityEnum.valueOf(entityName).getTextureFile());
-	}
-	
-	public String getPhysicsName(String entityName){
-		return EntityEnum.valueOf(entityName).getPhysicsName();
 	}
 	
 	public World getWorld(){

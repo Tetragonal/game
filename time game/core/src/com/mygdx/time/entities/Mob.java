@@ -1,6 +1,5 @@
 package com.mygdx.time.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.time.screens.GameStage;
 
 public class Mob extends PhysicsEntity{
@@ -9,19 +8,19 @@ public class Mob extends PhysicsEntity{
 	private int maxHealth = 500;
 	MobHealthBar mobHealthBar = null;
 	
-	public Mob(float x, float y, Texture texture, String entityName, boolean isAirborne) {
-		super(x, y, texture, entityName);
+	public Mob(float x, float y, String entityName, boolean isAirborne) {
+		super(x, y, entityName);
 		worldDestination.set(x+sprite.getWidth()/2, y+sprite.getHeight()/2);
 		health = maxHealth;
 	}
-	public Mob(float x, float y, Texture texture, GameStage gameStage, String entityName, boolean isAirborne) {
-		this(x, y, texture, entityName, isAirborne);
+	public Mob(float x, float y, GameStage gameStage, String entityName, boolean isAirborne) {
+		this(x, y, entityName, isAirborne);
 		this.gameStage = gameStage;
 		createBody(x, y, gameStage.getWorld());
 	}
 	
-	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, Texture texture, GameStage gameStage){
-		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, texture, gameStage, "EnemyLaser");
+	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, GameStage gameStage, String entityName){
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, gameStage, entityName);
 		getStage().addActor(projectile);
 	}
 	

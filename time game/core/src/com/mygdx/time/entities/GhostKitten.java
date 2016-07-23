@@ -1,6 +1,5 @@
 package com.mygdx.time.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
@@ -9,8 +8,8 @@ public class GhostKitten extends KinematicEntity{
 
 	private Player parentPlayer;
 	
-	public GhostKitten(float x, float y, Texture texture, Player attachedPlayer, GameStage gameStage, String name) {
-		super(x, y, texture, gameStage, name);
+	public GhostKitten(float x, float y, Player attachedPlayer, GameStage gameStage, String name) {
+		super(x, y, gameStage, name);
 		this.parentPlayer = attachedPlayer;
 		
 		

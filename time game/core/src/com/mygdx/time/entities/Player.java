@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -41,8 +40,8 @@ public class Player extends Mob{
 	private float testProj2FireAngle;
 	private boolean testProj2Boolean = false;
 	
-	public Player(float x, float y, Texture texture, GameStage gameStage, String entityName){
-		super(x, y, texture, gameStage, entityName, false);
+	public Player(float x, float y, GameStage gameStage, String entityName){
+		super(x, y, gameStage, entityName, false);
 		walkSound = TimeGame.assets.get("sound/walksound.mp3");
 		tpSound = TimeGame.assets.get("sound/warp2.ogg");
 		walkSound.setVolume(0.2f);
@@ -58,12 +57,6 @@ public class Player extends Mob{
 		});
 		ghostX = x+sprite.getWidth()/2;
 		ghostY = y+sprite.getHeight()/2;
-		
-		
-		for(int i=0; i<body.getFixtureList().size; i++){
-		body.getFixtureList().get(i).getFilterData().maskBits = Game.CATEGORY_NONCOLLIDABLE;
-		body.getFixtureList().get(i).getFilterData().categoryBits = Game.CATEGORY_ALLY;
-		}
 	}
 	
 	public void act(float delta){
@@ -85,7 +78,7 @@ public class Player extends Mob{
  	    if(testProj2Boolean == true && testProj2Count > 0){
  	    	testProj2Delay += delta;
  	    	if(testProj2Delay > .05){
- 	    		fireProjectile(0,0,5,10,testProj2FireAngle, TimeGame.assets.get("img/laser2.png"), gameStage);
+ 	    		fireProjectile(0,0,5,10,testProj2FireAngle, gameStage, "PLAYER_LASER");
  	    		testProj2Delay = 0;
  				testProj2Count--;
  	    	}
@@ -161,7 +154,7 @@ public class Player extends Mob{
     	    float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
     		if(testProjSpawn > .25){
     			for(int i=0; i<5; i++){
-        			fireProjectile(0,0,10,10,fireAngle-12+i*6, TimeGame.assets.get("img/laser2.png"), gameStage);
+        			fireProjectile(0, 0, 10, 10, fireAngle-12+i*6, gameStage, "PLAYER_LASER");
     			}
     			testProjSpawn = 0;
     		}
@@ -175,12 +168,6 @@ public class Player extends Mob{
 			}
     			
     	}
-	}
-	
-    @Override
-	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, Texture texture, GameStage gameStage){
-		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 5, texture, gameStage, "AllyLaser");
-		getStage().addActor(projectile);
 	}
 	
 	private void playWalkSound(){

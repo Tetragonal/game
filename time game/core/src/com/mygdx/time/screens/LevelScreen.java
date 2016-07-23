@@ -31,14 +31,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.entities.Entity;
 import com.mygdx.time.entities.EntityEnum;
 import com.mygdx.time.entities.PhysicsEntity;
 import com.mygdx.time.entities.Player;
-import com.mygdx.time.inventory.Inventory;
 import com.mygdx.time.inventory.InventoryWindow;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
@@ -180,7 +178,7 @@ public abstract class LevelScreen implements Screen{
 //		shapeRenderer.setColor(1, 0, 0, 1);
 //		shapeRenderer.rect(Gdx.graphics.getWidth()-GameConstants.CAMERA_OFFSET_X, 0, GameConstants.CAMERA_OFFSET_X, Gdx.graphics.getHeight());
 //		shapeRenderer.end();
-		debugRenderer.render(world, camera.combined);
+//		debugRenderer.render(world, camera.combined);
 
 	}
 
@@ -201,7 +199,7 @@ public abstract class LevelScreen implements Screen{
 			}
 		}else {
 			player.walkSound.pause();
-			inventoryWindow.setVisible(false);
+//			inventoryWindow.setVisible(false);
 		}
 		if(warpDestination != null){
 			LevelScreenManager.getInstance().setScreen(warpDestination, currentLevel);

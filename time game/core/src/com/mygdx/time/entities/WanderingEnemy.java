@@ -1,17 +1,16 @@
 package com.mygdx.time.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.mygdx.time.screens.GameStage;
 
 public class WanderingEnemy extends Mob{
 
-	public WanderingEnemy(float x, float y, Texture texture, String name, boolean isAirborne) {
-		super(x, y, texture, name, isAirborne);
+	public WanderingEnemy(float x, float y, String entityName, boolean isAirborne) {
+		super(x, y, entityName, isAirborne);
 	}
 	
-	public WanderingEnemy(float x, float y, Texture texture, GameStage gameStage, String entityName, boolean isAirborne) {
-		super(x, y, texture, entityName, isAirborne);
+	public WanderingEnemy(float x, float y, GameStage gameStage, String entityName, boolean isAirborne) {
+		this(x, y, entityName, isAirborne);
 		this.gameStage = gameStage;
 		createBody(x, y, gameStage.getWorld());
 		body.applyLinearImpulse(10, 0, body.getPosition().x + body.getLocalCenter().x, body.getPosition().y + body.getLocalCenter().y, true);
