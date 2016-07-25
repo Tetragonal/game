@@ -1,6 +1,7 @@
 package com.mygdx.time.entities;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -19,7 +20,7 @@ public abstract class PhysicsEntity extends Entity{
 	protected Cell cell;
 	
 	protected Vector2 worldDestination = new Vector2();
-	protected float maxSpeed = 8f;
+	protected float maxSpeed = 10f;
 	
 	protected Body body;
 	protected String entityName;
@@ -68,9 +69,6 @@ public abstract class PhysicsEntity extends Entity{
 		for(int i=0; i<body.getFixtureList().size; i++){
 			body.getFixtureList().get(i).setFilterData(f);
 		}
-		
-	    
-	    
 	}
 	
 	public void act(float delta){
@@ -90,10 +88,21 @@ public abstract class PhysicsEntity extends Entity{
 	public void move(){
 	    direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
 	    moveAngle  = direction.angle();
-	    if(Math.abs(body.getPosition().x + body.getLocalCenter().x - worldDestination.x) < 0.2 && Math.abs(body.getPosition().y + body.getLocalCenter().y - worldDestination.y) < 0.2){
-	    	body.setLinearVelocity(0, 0);
+	    
+	    body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(moveAngle), maxSpeed*MathUtils.sinDeg(moveAngle));
+	    
+	    if(Math.abs(body.getPosition().x + body.getLocalCenter().x - worldDestination.x) < 0.1){
+	    	body.setLinearVelocity(0, body.getLinearVelocity().y);
 	    	body.setAngularVelocity(0);
 	    }
+	    if(Math.abs(body.getPosition().y + body.getLocalCenter().y - worldDestination.y) < 0.2){
+	    	body.setLinearVelocity(body.getLinearVelocity().x, 0);
+	    	body.setAngularVelocity(0);
+	    }
+	}
+
+	public boolean isAirborne() {
+		return isAirborne;
 	}
 
 	

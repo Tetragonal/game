@@ -57,6 +57,7 @@ public class Player extends Mob{
 		});
 		ghostX = x+sprite.getWidth()/2;
 		ghostY = y+sprite.getHeight()/2;
+		maxSpeed = 8f;
 	}
 	
 	public void act(float delta){
@@ -142,9 +143,6 @@ public class Player extends Mob{
 	        	    getStage().getCamera().unproject(worldCoordinates);
 	
 	        	    worldDestination.set(worldCoordinates.x, worldCoordinates.y);
-	        	    direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
-	        	    moveAngle  = direction.angle();
-	        	    body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(moveAngle), maxSpeed*MathUtils.sinDeg(moveAngle));
 	        	}
         	}
         }else lmbHeldDown = false;

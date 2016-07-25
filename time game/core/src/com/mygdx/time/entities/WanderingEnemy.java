@@ -18,7 +18,7 @@ public class WanderingEnemy extends Mob{
 
 	public void act(float delta){
 		if(MathUtils.random(1000) > 992){
-			worldDestination.set(sprite.getX()+sprite.getWidth()/2+MathUtils.random(-50, 50), sprite.getY()+sprite.getHeight()/2+MathUtils.random(-50,50));
+			worldDestination.set(body.getPosition().x+body.getLocalCenter().x+MathUtils.random(-50, 50)/25f, body.getPosition().y+body.getLocalCenter().y+MathUtils.random(-50,50)/25f);
 		}
 		super.act(delta);
 	}

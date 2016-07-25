@@ -27,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -76,6 +77,8 @@ public abstract class LevelScreen implements Screen{
 	private World world;
 	Box2DDebugRenderer debugRenderer;
 	
+	private Group groundedGroup = new Group(), aerialGroup = new Group(), miscGroup = new Group();
+	
 	public LevelScreen(String previousLevel, String currentLevel){
 		this.previousLevel = previousLevel;
 		this.currentLevel = currentLevel; 
@@ -92,7 +95,7 @@ public abstract class LevelScreen implements Screen{
 		world.setContactListener(new TestContactListener(this));
 
 		Skin menuSkin = TimeGame.assets.get("ui/menuSkin.json");
-		Skin uiSkin = TimeGame.assets.get("temp inventory resources/skins/uiskin.json");
+//		Skin uiSkin = TimeGame.assets.get("temp inventory resources/skins/uiskin.json");
 		
 		map = TimeGame.assets.get(mapFile);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f/Game.PPM);
@@ -102,6 +105,9 @@ public abstract class LevelScreen implements Screen{
 		uiStage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), TimeGame.batch);
 		Gdx.input.setInputProcessor(new InputMultiplexer(gameStage, uiStage));
 		
+		gameStage.addActor(groundedGroup);
+		gameStage.addActor(aerialGroup);
+		gameStage.addActor(miscGroup);
 		addEntities();
 		
 		//set music
@@ -147,41 +153,20 @@ public abstract class LevelScreen implements Screen{
 			gameTimer -= 1/Game.ENGINE_FPS;
 		}
 		
-		//center camera on player
-			//Camera centered on you only
-//			camera.position.set(CAMERA_OFFSET_X/2*camera.zoom + player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
-			//Camera follows you
-			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)), (float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)), 0);
-			//TODO Camera follows the midpoint between your pressed cursor and your character
-		camera.update();
-		
-		//draw background layers
-		renderer.setView(camera);
-		renderer.render(backgroundLayers);
-		//draw actors
-		gameStage.draw();
-		//draw foreground layers
-		renderer.render(foregroundLayers);
-		
-		//draw ui
-		uiMatrix = camera.combined.cpy();
-		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		TimeGame.batch.setProjectionMatrix(uiMatrix);
-		TimeGame.batch.begin();
-			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp)", 10, 15);
-		TimeGame.batch.end();
-		uiStage.draw();
-		TimeGame.batch.setProjectionMatrix(camera.combined);
-		
-		//draw rectangle
-//		shapeRenderer.begin(ShapeType.Filled);
-//		shapeRenderer.setColor(1, 0, 0, 1);
-//		shapeRenderer.rect(Gdx.graphics.getWidth()-GameConstants.CAMERA_OFFSET_X, 0, GameConstants.CAMERA_OFFSET_X, Gdx.graphics.getHeight());
-//		shapeRenderer.end();
-//		debugRenderer.render(world, camera.combined);
-
+		updateCamera();
+		drawScreen();
 	}
 
+	public void updateCamera(){
+		//center camera on player
+		//Camera centered on you only
+//		camera.position.set(CAMERA_OFFSET_X/2*camera.zoom + player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
+		//Camera follows you
+			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)), (float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)), 0);
+		//TODO Camera follows the midpoint between your pressed cursor and your character
+		camera.update();
+	}
+	
 	public void act(){
 //		player.acceptInput = !inventoryWindow.isVisible();
 		if(!pauseWindow.isVisible()){
@@ -189,20 +174,55 @@ public abstract class LevelScreen implements Screen{
 			world.step(1/Game.ENGINE_FPS, 6, 2);
 			gameStage.act();
 			uiStage.act();
-			for(Actor actor : gameStage.getActors()){
-				if(((Entity) actor).isFlaggedForDelete()){
-					if(actor instanceof PhysicsEntity){
-						world.destroyBody(((PhysicsEntity) actor).getBody());
-					}
-					actor.remove();
-				}
-			}
+			groupActors();
 		}else {
 			player.walkSound.pause();
 //			inventoryWindow.setVisible(false);
 		}
 		if(warpDestination != null){
 			LevelScreenManager.getInstance().setScreen(warpDestination, currentLevel);
+		}
+		
+	}
+	
+	public void groupActors(){
+		//sort actors
+		for(Actor actor : gameStage.getActors()){
+			if(actor instanceof PhysicsEntity){
+				if(((PhysicsEntity)actor).isAirborne()){
+					aerialGroup.addActor(actor);
+				}else{
+					groundedGroup.addActor(actor);
+				}
+			}else if (actor instanceof Entity){
+				miscGroup.addActor(actor);
+			}
+		}
+		
+		//delete actors
+		for(Actor actor : groundedGroup.getChildren()){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
+				if(actor instanceof PhysicsEntity){
+					world.destroyBody(((PhysicsEntity) actor).getBody());
+				}
+				actor.remove();
+			}
+		}
+		for(Actor actor : aerialGroup.getChildren()){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
+				if(actor instanceof PhysicsEntity){
+					world.destroyBody(((PhysicsEntity) actor).getBody());
+				}
+				actor.remove();
+			}
+		}
+		for(Actor actor : miscGroup.getChildren()){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
+				if(actor instanceof PhysicsEntity){
+					world.destroyBody(((PhysicsEntity) actor).getBody());
+				}
+				actor.remove();
+			}
 		}
 	}
 	
@@ -253,10 +273,10 @@ public abstract class LevelScreen implements Screen{
 	
 	private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
-            camera.zoom += 0.05; //0.005
+            camera.zoom += 0.005; //0.005
         }
         if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
-            camera.zoom -= 0.05;
+            camera.zoom -= 0.005;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             player.takeDamage(5);
@@ -305,6 +325,44 @@ public abstract class LevelScreen implements Screen{
 	
 	public void setWarpDestination(String warpDestination){
 		this.warpDestination = warpDestination;
+	}
+	
+	public void drawScreen(){
+		TimeGame.batch.setProjectionMatrix(camera.combined);
+		renderer.setView(camera);
+		
+		//draw background layers
+		renderer.render(backgroundLayers);
+		//draw grounded 
+		TimeGame.batch.begin();
+		groundedGroup.draw(TimeGame.batch, 1);
+		TimeGame.batch.end();
+		//draw foreground layers
+		renderer.render(foregroundLayers);
+		//draw aerial
+		TimeGame.batch.begin();
+		aerialGroup.draw(TimeGame.batch, 1);
+		//draw misc
+		miscGroup.draw(TimeGame.batch, 1);
+		TimeGame.batch.end();
+		
+		//draw ui
+		uiMatrix = camera.combined.cpy();
+		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		TimeGame.batch.setProjectionMatrix(uiMatrix);
+		TimeGame.batch.begin();
+			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp)", 10, 15);
+		TimeGame.batch.end();
+		gameStage.draw();
+		uiStage.draw();
+		TimeGame.batch.setProjectionMatrix(camera.combined);
+		
+		//draw rectangle
+//		shapeRenderer.begin(ShapeType.Filled);
+//		shapeRenderer.setColor(1, 0, 0, 1);
+//		shapeRenderer.rect(Gdx.graphics.getWidth()-GameConstants.CAMERA_OFFSET_X, 0, GameConstants.CAMERA_OFFSET_X, Gdx.graphics.getHeight());
+//		shapeRenderer.end();
+//		debugRenderer.render(world, camera.combined);
 	}
 	
 }

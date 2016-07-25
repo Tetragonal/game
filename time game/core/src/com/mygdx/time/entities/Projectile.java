@@ -16,12 +16,14 @@ public class Projectile extends PhysicsEntity{
 		maxSpeed = speed;
 		body.setBullet(true);
 		worldDestination.set(x+100000*MathUtils.cosDeg(angleDeg), y+100000*MathUtils.sinDeg(angleDeg));
-//		sprite.setOrigin(0, sprite.getHeight()/2);
-//		body.setTransform(0, sprite.getHeight()/2, 0);
+		sprite.setOrigin(0, sprite.getHeight()/2);
+		body.setTransform(0, sprite.getHeight()/2, 0);
+		this.setOrigin(0, sprite.getHeight()/2);
 		sprite.rotate(angleDeg);
 		rotateBy(angleDeg);
 		body.setTransform(x, y, angleDeg*MathUtils.degreesToRadians);
 		body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(angleDeg), maxSpeed*MathUtils.sinDeg(angleDeg));
+		this.debug();
 		
 	}
 
