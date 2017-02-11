@@ -15,7 +15,6 @@ public abstract class Entity extends Actor{
 	protected Sprite sprite;
 	protected GameStage gameStage;
 	protected World world = null;
-	protected int health;
 	protected boolean isFlaggedForDelete = false;
 	
 	public Entity(float x, float y, Texture texture){

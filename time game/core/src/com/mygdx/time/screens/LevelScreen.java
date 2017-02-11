@@ -46,7 +46,7 @@ import com.mygdx.time.map.MapLoader;
 import com.mygdx.time.map.TestContactListener;
 
 
-public abstract class LevelScreen implements Screen{
+public class LevelScreen implements Screen{
 	
 	protected TiledMap map;
 	protected GameStage gameStage;
@@ -68,7 +68,6 @@ public abstract class LevelScreen implements Screen{
 	private FitViewport viewport;
 	
 	private BitmapFont font = new BitmapFont(); //temporary
-	private ShapeRenderer shapeRenderer = new ShapeRenderer(); //temporary
 	private Matrix4 uiMatrix = new Matrix4();
 	private Player player;
 	
@@ -79,9 +78,10 @@ public abstract class LevelScreen implements Screen{
 	
 	private Group groundedGroup = new Group(), aerialGroup = new Group(), miscGroup = new Group();
 	
-	public LevelScreen(String previousLevel, String currentLevel){
+	public LevelScreen(String previousLevel, String currentLevel, String mapFile){
 		this.previousLevel = previousLevel;
-		this.currentLevel = currentLevel; 
+		this.currentLevel = currentLevel;
+		this.mapFile = mapFile;
 	}
 	
 	@Override
@@ -160,7 +160,7 @@ public abstract class LevelScreen implements Screen{
 	public void updateCamera(){
 		//center camera on player
 		//Camera centered on you only
-//		camera.position.set(CAMERA_OFFSET_X/2*camera.zoom + player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
+			//camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
 		//Camera follows you
 			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)), (float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)), 0);
 		//TODO Camera follows the midpoint between your pressed cursor and your character
@@ -256,7 +256,6 @@ public abstract class LevelScreen implements Screen{
 		gameStage.dispose();
 		
 		font.dispose(); //temporary
-		shapeRenderer.dispose(); //temporary
 		
 		TimeGame.assets.unload("sound/walksound.mp3");
 		TimeGame.assets.unload("sound/warp2.ogg");
@@ -356,13 +355,6 @@ public abstract class LevelScreen implements Screen{
 		gameStage.draw();
 		uiStage.draw();
 		TimeGame.batch.setProjectionMatrix(camera.combined);
-		
-		//draw rectangle
-//		shapeRenderer.begin(ShapeType.Filled);
-//		shapeRenderer.setColor(1, 0, 0, 1);
-//		shapeRenderer.rect(Gdx.graphics.getWidth()-GameConstants.CAMERA_OFFSET_X, 0, GameConstants.CAMERA_OFFSET_X, Gdx.graphics.getHeight());
-//		shapeRenderer.end();
-//		debugRenderer.render(world, camera.combined);
 	}
 	
 }

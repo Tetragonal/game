@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
 import com.mygdx.time.tween.ActorAccessor;
 
@@ -197,7 +198,7 @@ public class MainMenu implements Screen {
 
 			fadeTimer += delta;
 			if(fadeTimer > 3){
-				 ((TimeGame) Gdx.app.getApplicationListener()).setScreen(new MapTwo("map_1", "map_2")); //TODO: make a default spawn location
+				LevelScreenManager.getInstance().setScreen("map_2", "map_1"); //TODO: make a default spawn location
 			}
 		}
 		
