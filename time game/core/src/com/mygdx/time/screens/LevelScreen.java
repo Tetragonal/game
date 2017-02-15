@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -34,11 +33,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.entities.BlizzardAoE;
+import com.mygdx.time.entities.CollidableEntity;
 import com.mygdx.time.entities.Entity;
 import com.mygdx.time.entities.EntityEnum;
-import com.mygdx.time.entities.PhysicsEntity;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.inventory.InventoryWindow;
+import com.mygdx.time.manager.CollisionHandler;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
 import com.mygdx.time.map.Game;
@@ -125,7 +126,7 @@ public class LevelScreen implements Screen{
 					pauseWindow.setVisible(!pauseWindow.isVisible());
 				}
 				else if(keycode == Keys.V && pauseWindow.isVisible() == false){
-					inventoryWindow.setVisible(!inventoryWindow.isVisible());
+					//inventoryWindow.setVisible(!inventoryWindow.isVisible());
 				}
 				return true;
 			}
@@ -182,14 +183,18 @@ public class LevelScreen implements Screen{
 		if(warpDestination != null){
 			LevelScreenManager.getInstance().setScreen(warpDestination, currentLevel);
 		}
-		
+		CollisionHandler.getInstance().act();
+		Game.gameTick++;
 	}
 	
 	public void groupActors(){
 		//sort actors
 		for(Actor actor : gameStage.getActors()){
-			if(actor instanceof PhysicsEntity){
-				if(((PhysicsEntity)actor).isAirborne()){
+			if(actor instanceof CollidableEntity){
+				if(!((CollidableEntity) actor).isSolid){
+					miscGroup.addActor(actor);
+				}
+				else if(((CollidableEntity)actor).isAirborne()){
 					aerialGroup.addActor(actor);
 				}else{
 					groundedGroup.addActor(actor);
@@ -201,25 +206,25 @@ public class LevelScreen implements Screen{
 		
 		//delete actors
 		for(Actor actor : groundedGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof PhysicsEntity){
-					world.destroyBody(((PhysicsEntity) actor).getBody());
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+				if(actor instanceof CollidableEntity){
+					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
 				actor.remove();
 			}
 		}
 		for(Actor actor : aerialGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof PhysicsEntity){
-					world.destroyBody(((PhysicsEntity) actor).getBody());
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+				if(actor instanceof CollidableEntity){
+					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
 				actor.remove();
 			}
 		}
 		for(Actor actor : miscGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof PhysicsEntity){
-					world.destroyBody(((PhysicsEntity) actor).getBody());
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+				if(actor instanceof CollidableEntity){
+					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
 				actor.remove();
 			}
@@ -299,8 +304,10 @@ public class LevelScreen implements Screen{
 		gameStage.addWanderingEntity(2, 2, "BLUE_SLIME");
 		gameStage.addWanderingEntity(4, 5, "BLUE_SLIME");
 		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
+		gameStage.addActor(new BlizzardAoE(15, 10, gameStage, "BLIZZARD"));
 		gameStage.addActor(player);
-		gameStage.setKeyboardFocus(player);	
+		
+		gameStage.setKeyboardFocus(player);
 	}
 	
 	private void loadAssets(){
@@ -316,6 +323,7 @@ public class LevelScreen implements Screen{
 		TimeGame.assets.load("img/kittenTransparentBlue.png", Texture.class); //ghost texture
 		TimeGame.assets.load("img/laser2.png", Texture.class);
 		TimeGame.assets.load("img/whitePixel.png", Texture.class);
+		TimeGame.assets.load("img/blizzard.png", Texture.class);
 
 		TimeGame.assets.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 		TimeGame.assets.load(mapFile, TiledMap.class);
@@ -332,8 +340,10 @@ public class LevelScreen implements Screen{
 		
 		//draw background layers
 		renderer.render(backgroundLayers);
-		//draw grounded 
 		TimeGame.batch.begin();
+		//draw misc
+		miscGroup.draw(TimeGame.batch, 1);
+		//draw grounded 
 		groundedGroup.draw(TimeGame.batch, 1);
 		TimeGame.batch.end();
 		//draw foreground layers
@@ -341,8 +351,6 @@ public class LevelScreen implements Screen{
 		//draw aerial
 		TimeGame.batch.begin();
 		aerialGroup.draw(TimeGame.batch, 1);
-		//draw misc
-		miscGroup.draw(TimeGame.batch, 1);
 		TimeGame.batch.end();
 		
 		//draw ui
@@ -350,11 +358,14 @@ public class LevelScreen implements Screen{
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		TimeGame.batch.setProjectionMatrix(uiMatrix);
 		TimeGame.batch.begin();
-			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp)", 10, 15);
+			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp), Right click - shotgun, Middle click - burst", 10, 15);
+			font.draw(TimeGame.batch, Game.console, 10, 700);
+			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
 		TimeGame.batch.end();
-		gameStage.draw();
 		uiStage.draw();
+		
 		TimeGame.batch.setProjectionMatrix(camera.combined);
+		//debugRenderer.render(world, camera.combined);
 	}
 	
 }

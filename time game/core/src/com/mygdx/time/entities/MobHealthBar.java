@@ -17,7 +17,7 @@ public class MobHealthBar extends Entity{
 	public MobHealthBar(float x, float y, Mob parentMob) {
 		super(x, y, (Texture)TimeGame.assets.get("img/whitePixel.png"));
 		this.parentMob = parentMob;
-		this.debug();
+		parentMob.attachedEntities.add(this);
 		parentMob.getStage().addActor(this);
 		
 		Texture texture = TimeGame.assets.get("img/whitePixel.png");

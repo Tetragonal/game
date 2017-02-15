@@ -1,31 +1,20 @@
 package com.mygdx.time.entities;
 
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.mygdx.time.map.Game;
-import com.mygdx.time.screens.GameStage;
+import com.badlogic.gdx.graphics.Texture;
+import com.mygdx.time.TimeGame;
 
-public class GhostKitten extends KinematicEntity{
+public class GhostKitten extends Entity{
 
 	private Player parentPlayer;
 	
-	public GhostKitten(float x, float y, Player attachedPlayer, GameStage gameStage, String name) {
-		super(x, y, gameStage, name);
+	public GhostKitten(float x, float y, Player attachedPlayer) {
+		super(x, y, (Texture)TimeGame.assets.get("img/kittenTransparentBlue.png"));
 		this.parentPlayer = attachedPlayer;
-		
-		
-		 Filter f = new Filter();
-	     f.categoryBits = Game.CATEGORY_NONCOLLIDABLE;
-	      f.maskBits = Game.CATEGORY_NONCOLLIDABLE;
-		
-		for(int i=0; i<body.getFixtureList().size; i++){
-			body.getFixtureList().get(i).setFilterData(f);
-		}
 	}
 	
 	public void act(float delta){
 		super.act(delta);
 		this.setPosition(parentPlayer.ghostX-this.getWidth()/2, parentPlayer.ghostY-this.getHeight()/2);
-		body.setTransform(parentPlayer.ghostX-this.getWidth()/2, parentPlayer.ghostY-this.getHeight()/2 , 0);
 		if(parentPlayer.getHealth() <= 0){
 			this.isFlaggedForDelete = true;
 		}

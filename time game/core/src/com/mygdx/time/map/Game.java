@@ -35,4 +35,8 @@ public class Game {
 		
 		MASK_AIRBORNE = CATEGORY_AIRBORNE | CATEGORY_TERRAIN_AERIAL,
 		MASK_GROUNDED = CATEGORY_GROUNDED | CATEGORY_TERRAIN_GROUND;
+	
+	public static int gameTick = 0;
+	public static String console = "";
+	
 }

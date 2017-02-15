@@ -1,5 +1,7 @@
 package com.mygdx.time.entities;
 
+import com.mygdx.time.combat.Buff;
+import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
 public class AggroEnemyTest extends WanderingEnemy{
@@ -17,7 +19,9 @@ public class AggroEnemyTest extends WanderingEnemy{
 		
 		testProjectileSpawn += delta;
 		if(testProjectileSpawn > .1){
-			fireProjectile(0,0,10,2,testProjectileCounter%36*10, gameStage, "ENEMY_LASER");
+			for(int i=0; i<3; i++){
+				fireProjectile(0,0,0,2,testProjectileCounter%36*10+i*13, gameStage, "ENEMY_LASER");
+			}
 			testProjectileCounter++;
 			testProjectileSpawn = 0;
 		}

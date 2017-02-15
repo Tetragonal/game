@@ -35,7 +35,7 @@ public class GameStage extends Stage{
 	}
 	
 	public GhostKitten addGhostKitten(Player attachedPlayer){
-		GhostKitten ghostKitten = new GhostKitten(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, attachedPlayer, this, "GHOST_KITTEN");
+		GhostKitten ghostKitten = new GhostKitten(levelScreen.startX/Game.PPM, levelScreen.startY/Game.PPM, attachedPlayer);
 		addActor(ghostKitten);
 		return ghostKitten;
 	}

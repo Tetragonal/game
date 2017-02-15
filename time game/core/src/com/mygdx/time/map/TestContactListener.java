@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.mygdx.time.entities.CollidableEntity;
 import com.mygdx.time.entities.Mob;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.entities.Projectile;
@@ -20,27 +21,30 @@ public class TestContactListener implements ContactListener{
 	
 	@Override
 	public void beginContact(Contact contact) {
+		/*
 		if(contact.getFixtureA().getBody().getUserData() instanceof WanderingEnemy || contact.getFixtureB().getBody().getUserData() instanceof WanderingEnemy){
-			//System.out.println("bubly collision");
+			System.out.println("bubly collision");
+		}
+		*/
+		Object contactA = contact.getFixtureA().getBody().getUserData();
+		Object contactB = contact.getFixtureB().getBody().getUserData();
+		
+		if(contactA instanceof CollidableEntity && contactB instanceof CollidableEntity){
+			CollidableEntity a = (CollidableEntity) contactA;
+			CollidableEntity b = (CollidableEntity) contactB;
+			a.collideWith(b);
+			b.collideWith(a);
 		}
 		
+		//temp until terrain becomes CollidableEntity
 		if(contact.getFixtureA().getBody().getUserData() instanceof Projectile){
-			Projectile proj = (Projectile) contact.getFixtureA().getBody().getUserData();
-			proj.flagForDelete();
-			if(contact.getFixtureB().getBody().getUserData() instanceof Mob){
-				Mob mob = (Mob) contact.getFixtureB().getBody().getUserData();
-				mob.takeDamage(proj.getDamage());
-			}
+			((Projectile)contactA).isFlaggedForDelete = true;
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Projectile){
+			((Projectile)contactB).isFlaggedForDelete = true;
 		}
 		
-		if(contact.getFixtureB().getBody().getUserData() instanceof Projectile){
-			Projectile proj = (Projectile) contact.getFixtureB().getBody().getUserData();
-			proj.flagForDelete();
-			if(contact.getFixtureA().getBody().getUserData() instanceof Mob){
-				Mob mob = (Mob) contact.getFixtureA().getBody().getUserData();
-				mob.takeDamage(proj.getDamage());
-			}
-		}
+		////
 		
 		if(contact.getFixtureA().getBody().getUserData() instanceof MapObject){
 			if(contact.getFixtureB().getBody().getUserData() instanceof Player){
@@ -62,6 +66,12 @@ public class TestContactListener implements ContactListener{
 	@Override
 	public void endContact(Contact contact) {
 		// TODO Auto-generated method stub
+		if(contact.getFixtureA().getBody().getUserData() instanceof CollidableEntity && contact.getFixtureB().getBody().getUserData() instanceof CollidableEntity){
+			CollidableEntity a = (CollidableEntity) contact.getFixtureA().getBody().getUserData();
+			CollidableEntity b = (CollidableEntity) contact.getFixtureB().getBody().getUserData();
+			a.endCollideWith(b);
+			b.endCollideWith(a);
+		}
 		
 	}
 

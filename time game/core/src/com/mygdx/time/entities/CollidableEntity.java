@@ -1,44 +1,50 @@
 package com.mygdx.time.entities;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
-public abstract class PhysicsEntity extends Entity{
-
+public abstract class CollidableEntity extends Entity{
+	//old Box2D collision/movement, change later (movement will be in Mob)
 	protected Vector2 direction = new Vector2();
 	protected float moveAngle;
-	
-	protected String blockedKey = "blocked";
-	protected Cell cell;
-	
 	protected Vector2 worldDestination = new Vector2();
-	protected float maxSpeed = 10f;
-	
+	protected float modifiedMovementSpeed = 10f;
 	protected Body body;
 	protected String entityName;
 	protected boolean isAirborne;
 	
-	public PhysicsEntity(float x, float y, String entityName) {
+	//from srugs
+	public int mask;
+	public int category;
+	public boolean isSolid; //whether it blocks movement on collision
+	public ArrayList<Polygon> hitbox = new ArrayList<Polygon>();
+	public Rectangle boundingBox;
+	
+	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, boolean isSensor) {
 		super(x, y, entityName);
 		this.entityName = entityName;
-	}
-	
-	public PhysicsEntity(float x, float y, GameStage gameStage, String entityName) {
-		this(x, y, entityName);
 		this.gameStage = gameStage;
-		createBody(x, y, gameStage.getWorld());
+		createBody(x, y, isSensor);
+		isSolid = !isSensor;
+		
+		boundingBox = sprite.getBoundingRectangle();
+		hitbox.add(new Polygon(new float[]{x,y, x+sprite.getWidth(),y, x+sprite.getWidth(),y+sprite.getHeight(), x,y+sprite.getHeight()}));
+		for(Polygon p : hitbox){
+			boundingBox.merge(p.getBoundingRectangle());
+		}
 	}
 	
-	public void createBody(float x, float y, World world){
-		this.world = world;
+	public void createBody(float x, float y, boolean isSensor){
 		isAirborne = EntityEnum.valueOf(entityName).isAirborne();
 		BodyDef bd = new BodyDef();
 		bd.type = BodyDef.BodyType.DynamicBody;
@@ -47,8 +53,9 @@ public abstract class PhysicsEntity extends Entity{
 		fd.density = 1f;
 		fd.friction = 0f;
 		fd.restitution = 0f;
+		fd.isSensor = isSensor;
 
-		body = world.createBody(bd);
+		body = gameStage.getWorld().createBody(bd);
 		
 		gameStage.getLoader().attachFixture(body, EntityEnum.valueOf(entityName).getPhysicsName(), fd, 2f);
 		body.setUserData(this);
@@ -59,11 +66,15 @@ public abstract class PhysicsEntity extends Entity{
 		
 		Filter f = new Filter();
 	    f.categoryBits = EntityEnum.valueOf(entityName).getCategory();
+	    category = EntityEnum.valueOf(entityName).getCategory();
 	    f.maskBits = EntityEnum.valueOf(entityName).getMask();
+	    mask = EntityEnum.valueOf(entityName).getMask();
     	if(isAirborne){
     		f.maskBits = (short) (f.maskBits | Game.MASK_AIRBORNE);
+    		mask = (short) (f.maskBits | Game.MASK_AIRBORNE);
     	}else{
     		f.maskBits = (short) (f.maskBits | Game.MASK_GROUNDED);
+    		mask = (short) (f.maskBits | Game.MASK_GROUNDED);
     	}
 		
 		for(int i=0; i<body.getFixtureList().size; i++){
@@ -89,7 +100,7 @@ public abstract class PhysicsEntity extends Entity{
 	    direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
 	    moveAngle  = direction.angle();
 	    
-	    body.setLinearVelocity(maxSpeed*MathUtils.cosDeg(moveAngle), maxSpeed*MathUtils.sinDeg(moveAngle));
+	    body.setLinearVelocity(modifiedMovementSpeed*MathUtils.cosDeg(moveAngle), modifiedMovementSpeed*MathUtils.sinDeg(moveAngle));
 	    
 	    if(Math.abs(body.getPosition().x + body.getLocalCenter().x - worldDestination.x) < 0.1){
 	    	body.setLinearVelocity(0, body.getLinearVelocity().y);
@@ -105,5 +116,12 @@ public abstract class PhysicsEntity extends Entity{
 		return isAirborne;
 	}
 
+	public void collideWith(CollidableEntity e){
+		
+	}
+	
+	public void endCollideWith(CollidableEntity e){
+		
+	}
 	
 }

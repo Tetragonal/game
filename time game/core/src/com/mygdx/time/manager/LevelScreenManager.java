@@ -23,7 +23,7 @@ public class LevelScreenManager {
 		return instance;
 	}
 	
-	/** Sets screen by searching through the enum for the keyword. */
+	/** Sets screen by searching through the enum for the keyword */
 	public void setScreen(String mapName, String previousScreen) {
 		System.out.println(mapName + " " + previousScreen);
 		LevelScreen newScreen = LevelScreenEnum.valueOf(mapName).setScreen(previousScreen);

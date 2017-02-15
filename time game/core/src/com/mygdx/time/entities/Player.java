@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.mygdx.time.TimeGame;
+import com.mygdx.time.combat.Buff;
+import com.mygdx.time.manager.CollisionHandler;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
@@ -57,7 +59,13 @@ public class Player extends Mob{
 		});
 		ghostX = x+sprite.getWidth()/2;
 		ghostY = y+sprite.getHeight()/2;
-		maxSpeed = 8f;
+		baseMovementSpeed = 8;
+		
+		//test
+		CollisionHandler.getInstance().allyMobList.add(this);
+		Buff healthRegenBuff = new Buff();
+		healthRegenBuff.damagePerTick=-20/Game.ENGINE_FPS;
+		this.addBuff(healthRegenBuff);
 	}
 	
 	public void act(float delta){
@@ -70,7 +78,7 @@ public class Player extends Mob{
 		handlePositionLog(delta);
 		
 		testProj2Refill += delta;
-		while(testProj2Refill > .2){
+		while(!testProj2Boolean == true && testProj2Refill > .2){
 			testProj2Refill -= .2;
 			testProj2Count++;
 			testProj2Count = MathUtils.clamp(testProj2Count, 0, 5);
@@ -78,8 +86,8 @@ public class Player extends Mob{
 
  	    if(testProj2Boolean == true && testProj2Count > 0){
  	    	testProj2Delay += delta;
- 	    	if(testProj2Delay > .05){
- 	    		fireProjectile(0,0,5,10,testProj2FireAngle, gameStage, "PLAYER_LASER");
+ 	    	if(testProj2Delay > .075){
+ 	    		fireProjectile(0,0,20,50,testProj2FireAngle, gameStage, "PLAYER_LASER");
  	    		testProj2Delay = 0;
  				testProj2Count--;
  	    	}
@@ -152,7 +160,7 @@ public class Player extends Mob{
     	    float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
     		if(testProjSpawn > .25){
     			for(int i=0; i<5; i++){
-        			fireProjectile(0, 0, 10, 10, fireAngle-12+i*6, gameStage, "PLAYER_LASER");
+        			fireProjectile(0, 0, 15, 10, fireAngle-12+i*6, gameStage, "PLAYER_LASER");
     			}
     			testProjSpawn = 0;
     		}
