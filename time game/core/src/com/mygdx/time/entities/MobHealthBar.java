@@ -52,12 +52,12 @@ public class MobHealthBar extends Entity{
 	
 	public void act(float delta){
 		super.act(delta);
-		this.setPosition(parentMob.getBody().getPosition().x, parentMob.getBody().getPosition().y+parentMob.getSprite().getHeight()*1.1f);
+		this.setPosition(parentMob.getX(), parentMob.getY()+parentMob.getSprite().getHeight()*1.1f);
 		float spriteSize = MathUtils.clamp(parentMob.getSprite().getWidth()*parentMob.getHealthPercent(), 0, parentMob.getSprite().getWidth());
 		sprite.setSize(spriteSize, parentMob.getSprite().getWidth()/10);
 		
 		if(parentMob.getHealth() <= 0){
-			this.isFlaggedForDelete = true;
+			flagForDelete();
 		}
 	}
 	

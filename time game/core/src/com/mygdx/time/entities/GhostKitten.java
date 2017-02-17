@@ -16,7 +16,7 @@ public class GhostKitten extends Entity{
 		super.act(delta);
 		this.setPosition(parentPlayer.ghostX-this.getWidth()/2, parentPlayer.ghostY-this.getHeight()/2);
 		if(parentPlayer.getHealth() <= 0){
-			this.isFlaggedForDelete = true;
+			this.flagForDelete();
 		}
 		setVisible(parentPlayer.secondTimer > parentPlayer.WARP_SECONDS);
 	}

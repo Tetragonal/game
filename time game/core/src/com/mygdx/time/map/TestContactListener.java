@@ -32,16 +32,16 @@ public class TestContactListener implements ContactListener{
 		if(contactA instanceof CollidableEntity && contactB instanceof CollidableEntity){
 			CollidableEntity a = (CollidableEntity) contactA;
 			CollidableEntity b = (CollidableEntity) contactB;
-			a.collideWith(b);
-			b.collideWith(a);
+			//a.collideWith(b);
+			//b.collideWith(a);
 		}
 		
 		//temp until terrain becomes CollidableEntity
 		if(contact.getFixtureA().getBody().getUserData() instanceof Projectile){
-			((Projectile)contactA).isFlaggedForDelete = true;
+			((Projectile)contactA).flagForDelete();
 		}
 		if(contact.getFixtureB().getBody().getUserData() instanceof Projectile){
-			((Projectile)contactB).isFlaggedForDelete = true;
+			((Projectile)contactB).flagForDelete();
 		}
 		
 		////

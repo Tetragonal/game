@@ -16,7 +16,7 @@ public abstract class Entity extends Actor{
 
 	protected Sprite sprite;
 	protected GameStage gameStage;
-	public boolean isFlaggedForDelete = false;
+	private boolean isFlaggedForDelete = false;
 	
 	//from srugs
 	Vector2 position;
@@ -53,5 +53,13 @@ public abstract class Entity extends Actor{
 	
 	public Sprite getSprite(){
 		return sprite;
+	}
+	
+	public void flagForDelete(){
+		isFlaggedForDelete = true;
+	}
+
+	public boolean isFlaggedForDelete() {
+		return isFlaggedForDelete;
 	}
 }

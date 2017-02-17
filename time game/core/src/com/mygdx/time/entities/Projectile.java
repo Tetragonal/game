@@ -24,6 +24,7 @@ public class Projectile extends CollidableEntity{
 		//body.setTransform(0, sprite.getHeight()/2, 0);
 		this.setOrigin(0, sprite.getHeight()/2);
 		sprite.rotate(angleDeg);
+		rotation = angleDeg;
 		rotateBy(angleDeg);
 		float radians = angleDeg*MathUtils.degreesToRadians;
 		body.setTransform(x+(float)Math.sin(radians)*sprite.getHeight()/2, y-(float)Math.cos(radians)*sprite.getHeight()/2, radians);
@@ -42,15 +43,16 @@ public class Projectile extends CollidableEntity{
 	    body.setFixedRotation(false);
 		timer += delta;
 		if(timer > duration){
-			isFlaggedForDelete = true;
+			flagForDelete();
 		}else{
 			super.act(delta);
 		}
+		body.setTransform(this.getX(), this.getY(), moveAngle*MathUtils.degreesToRadians);
 	}
 	
 	@Override
 	public void collideWith(CollidableEntity e){
-		this.isFlaggedForDelete = true;
+		flagForDelete();
 		System.out.println("Proj collided");
 		if(e instanceof Mob){
 			((Mob)e).takeDamage(DamageCalculator.calculateDamage((Mob)e, DamageCalculator.PHYSICAL, damage));
@@ -60,5 +62,10 @@ public class Projectile extends CollidableEntity{
 			System.out.println(e.getName() + " has " + ((Mob) e).buffList.size() + " stacks of debuff");
 			Game.console = e.getName() + " has " + ((Mob) e).buffList.size() + " stacks of debuff\n";
 		}
+	}
+	
+	@Override
+	public void flagForDelete(){
+		super.flagForDelete();
 	}
 }
