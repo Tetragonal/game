@@ -37,11 +37,16 @@ public abstract class CollidableEntity extends Entity{
 		createBody(x, y, isSensor);
 		isSolid = !isSensor;
 		
+		
 		boundingBox = sprite.getBoundingRectangle();
 		hitbox.add(new Polygon(new float[]{x,y, x+sprite.getWidth(),y, x+sprite.getWidth(),y+sprite.getHeight(), x,y+sprite.getHeight()}));
 		for(Polygon p : hitbox){
 			boundingBox.merge(p.getBoundingRectangle());
 		}
+	}
+	
+	public void translate(float x, float y){
+		
 	}
 	
 	public void createBody(float x, float y, boolean isSensor){
@@ -83,33 +88,19 @@ public abstract class CollidableEntity extends Entity{
 	}
 	
 	public void act(float delta){
+		/*
 		Vector2 position = body.getPosition();
 		float degrees = (float) Math.toDegrees(body.getAngle());
 		this.setPosition(position.x, position.y);
 		this.setRotation(degrees);
 	    sprite.setPosition(position.x, position.y);
-	    sprite.setRotation(degrees);
+	    sprite.setRotation(degrees);	
+	    */
 		move();
-	}
+    }
 		
 	public Body getBody(){
 		return body;
-	}
-	
-	public void move(){
-	    direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
-	    moveAngle  = direction.angle();
-	    
-	    body.setLinearVelocity(modifiedMovementSpeed*MathUtils.cosDeg(moveAngle), modifiedMovementSpeed*MathUtils.sinDeg(moveAngle));
-	    
-	    if(Math.abs(body.getPosition().x + body.getLocalCenter().x - worldDestination.x) < 0.1){
-	    	body.setLinearVelocity(0, body.getLinearVelocity().y);
-	    	body.setAngularVelocity(0);
-	    }
-	    if(Math.abs(body.getPosition().y + body.getLocalCenter().y - worldDestination.y) < 0.2){
-	    	body.setLinearVelocity(body.getLinearVelocity().x, 0);
-	    	body.setAngularVelocity(0);
-	    }
 	}
 
 	public boolean isAirborne() {
@@ -122,6 +113,32 @@ public abstract class CollidableEntity extends Entity{
 	
 	public void endCollideWith(CollidableEntity e){
 		
+	}
+	
+	public void move(){
+	    //direction.set(worldDestination.x-body.getPosition().x- body.getLocalCenter().x, worldDestination.y-body.getPosition().y - body.getLocalCenter().y);
+		direction.set(worldDestination.x-this.getX()- this.getWidth()/2, worldDestination.y-this.getY() - this.getHeight()/2);
+	    moveAngle  = direction.angle();
+	    //body.setTransform(this.getX()+modifiedMovementSpeed*MathUtils.cosDeg(moveAngle)/Game.ENGINE_FPS, this.getY()+modifiedMovementSpeed*MathUtils.sinDeg(moveAngle)/Game.ENGINE_FPS,0);
+	    for(Polygon p : hitbox){
+	    	p.translate(modifiedMovementSpeed*MathUtils.cosDeg(moveAngle)/Game.ENGINE_FPS, modifiedMovementSpeed*MathUtils.sinDeg(moveAngle)/Game.ENGINE_FPS);
+	    	p.setRotation((float) rotation);
+	    }
+	    boundingBox.setPosition(boundingBox.x+modifiedMovementSpeed*MathUtils.cosDeg(moveAngle)/Game.ENGINE_FPS, boundingBox.y+modifiedMovementSpeed*MathUtils.sinDeg(moveAngle)/Game.ENGINE_FPS);
+	    this.moveBy(modifiedMovementSpeed*MathUtils.cosDeg(moveAngle)/Game.ENGINE_FPS, modifiedMovementSpeed*MathUtils.sinDeg(moveAngle)/Game.ENGINE_FPS);
+	    sprite.setPosition(this.getX(), this.getY());
+	    /*
+	    body.setLinearVelocity(modifiedMovementSpeed*MathUtils.cosDeg(moveAngle), modifiedMovementSpeed*MathUtils.sinDeg(moveAngle));
+	    
+	    if(Math.abs(body.getPosition().x + body.getLocalCenter().x - worldDestination.x) < 0.1){
+	    	body.setLinearVelocity(0, body.getLinearVelocity().y);
+	    	body.setAngularVelocity(0);
+	    }
+	    if(Math.abs(body.getPosition().y + body.getLocalCenter().y - worldDestination.y) < 0.2){
+	    	body.setLinearVelocity(body.getLinearVelocity().x, 0);
+	    	body.setAngularVelocity(0);
+	    }
+	    */
 	}
 	
 }

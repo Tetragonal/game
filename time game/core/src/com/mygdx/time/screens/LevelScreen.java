@@ -149,7 +149,11 @@ public class LevelScreen implements Screen{
 		
 	    float frameTime = delta;// = Math.min(delta, 0.25f);
 		gameTimer += frameTime;
-		while(gameTimer >= 1/Game.ENGINE_FPS){
+		if(gameTimer >= 1/Game.ENGINE_FPS){
+			act();
+			gameTimer -= 1/Game.ENGINE_FPS;
+		}
+		if(gameTimer > 1/Game.ENGINE_FPS && delta/2 > gameTimer){
 			act();
 			gameTimer -= 1/Game.ENGINE_FPS;
 		}
@@ -206,7 +210,7 @@ public class LevelScreen implements Screen{
 		
 		//delete actors
 		for(Actor actor : groundedGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
 				if(actor instanceof CollidableEntity){
 					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
@@ -214,7 +218,7 @@ public class LevelScreen implements Screen{
 			}
 		}
 		for(Actor actor : aerialGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
 				if(actor instanceof CollidableEntity){
 					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
@@ -222,7 +226,7 @@ public class LevelScreen implements Screen{
 			}
 		}
 		for(Actor actor : miscGroup.getChildren()){
-			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete){
+			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
 				if(actor instanceof CollidableEntity){
 					world.destroyBody(((CollidableEntity) actor).getBody());
 				}
@@ -277,10 +281,10 @@ public class LevelScreen implements Screen{
 	
 	private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
-            camera.zoom += 0.005; //0.005
+            camera.zoom += 0.01; //0.005
         }
         if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
-            camera.zoom -= 0.005;
+            camera.zoom -= 0.01;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             player.takeDamage(5);
@@ -365,7 +369,7 @@ public class LevelScreen implements Screen{
 		uiStage.draw();
 		
 		TimeGame.batch.setProjectionMatrix(camera.combined);
-		//debugRenderer.render(world, camera.combined);
+		debugRenderer.render(world, camera.combined);
 	}
 	
 }

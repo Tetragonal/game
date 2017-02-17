@@ -3,6 +3,8 @@ package com.mygdx.time.entities;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.mygdx.time.combat.Buff;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
@@ -45,7 +47,7 @@ public class Mob extends CollidableEntity{
 		if(!isSleeping){
 			super.act(delta);
 			if(health <= 0){
-				isFlaggedForDelete = true;
+				flagForDelete();
 			}
 			handleBuffs();
 		}

@@ -131,10 +131,6 @@ public class Player extends Mob{
 		
 	}
 	
-	public void draw(Batch batch, float parentAlpha){
-		sprite.draw(batch);
-	}
-	
 	public void handleInput(float delta){
 		inputTimer+= delta;
 		testProjSpawn += delta;
