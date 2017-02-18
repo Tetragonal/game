@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -22,7 +23,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -72,10 +72,13 @@ public class LevelScreen implements Screen{
 	private Matrix4 uiMatrix = new Matrix4();
 	private Player player;
 	
+	private int cameraType = 1;
+	
 	private float gameTimer = 0;
 	
 	private World world;
 	Box2DDebugRenderer debugRenderer;
+	ShapeRenderer shapeRenderer = new ShapeRenderer();
 	
 	private Group groundedGroup = new Group(), aerialGroup = new Group(), miscGroup = new Group();
 	
@@ -88,9 +91,7 @@ public class LevelScreen implements Screen{
 	@Override
 	public void show() {
 		loadAssets();
-		
-		Box2D.init();
-		
+		System.out.println("New screen");
 		debugRenderer = new Box2DDebugRenderer();
 		world = new World(new Vector2(0,0), true);
 		world.setContactListener(new TestContactListener(this));
@@ -163,12 +164,38 @@ public class LevelScreen implements Screen{
 	}
 
 	public void updateCamera(){
+		switch(cameraType){
+			case 0:
+				camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
+				break;
+			case 1:
+				camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)),
+						(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)),
+						0);
+				break;
+			case 2:
+				camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)+0.01/Game.PPM*(Gdx.input.getX()-Gdx.graphics.getWidth()/2)),
+						(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)-0.01/Game.PPM*(Gdx.input.getY()-Gdx.graphics.getHeight()/2)),
+						0);
+				break;
+			default:
+				break;
+		}
 		//center camera on player
 		//Camera centered on you only
 			//camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
 		//Camera follows you
-			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)), (float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)), 0);
-		//TODO Camera follows the midpoint between your pressed cursor and your character
+		/*
+			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)),
+								(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)),
+								0);
+								*/
+		//Camera follows the midpoint between your pressed cursor and your character
+		/*
+			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)+0.01/Game.PPM*(Gdx.input.getX()-Gdx.graphics.getWidth()/2)),
+								(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)-0.01/Game.PPM*(Gdx.input.getY()-Gdx.graphics.getHeight()/2)),
+								0);
+								*/
 		camera.update();
 	}
 	
@@ -211,25 +238,16 @@ public class LevelScreen implements Screen{
 		//delete actors
 		for(Actor actor : groundedGroup.getChildren()){
 			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof CollidableEntity){
-					world.destroyBody(((CollidableEntity) actor).getBody());
-				}
 				actor.remove();
 			}
 		}
 		for(Actor actor : aerialGroup.getChildren()){
 			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof CollidableEntity){
-					world.destroyBody(((CollidableEntity) actor).getBody());
-				}
 				actor.remove();
 			}
 		}
 		for(Actor actor : miscGroup.getChildren()){
 			if(actor instanceof Entity && ((Entity) actor).isFlaggedForDelete()){
-				if(actor instanceof CollidableEntity){
-					world.destroyBody(((CollidableEntity) actor).getBody());
-				}
 				actor.remove();
 			}
 		}
@@ -292,6 +310,15 @@ public class LevelScreen implements Screen{
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.getHealth() > 0) {
             player.heal(5);
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            cameraType = 0;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        	cameraType = 1;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+        	cameraType = 2;
+        }
         camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 1000/camera.viewportWidth/Game.PPM);
 	}
 
@@ -310,6 +337,9 @@ public class LevelScreen implements Screen{
 		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
 		gameStage.addActor(new BlizzardAoE(15, 10, gameStage, "BLIZZARD"));
 		gameStage.addActor(player);
+		for(int i=0; i<250; i++){
+			gameStage.addWanderingEntity(player.getX(), player.getY(), "FRIENDLY_SLIME");
+		}
 		
 		gameStage.setKeyboardFocus(player);
 	}
@@ -365,11 +395,25 @@ public class LevelScreen implements Screen{
 			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp), Right click - shotgun, Middle click - burst", 10, 15);
 			font.draw(TimeGame.batch, Game.console, 10, 700);
 			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
+			font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);
 		TimeGame.batch.end();
 		uiStage.draw();
 		
 		TimeGame.batch.setProjectionMatrix(camera.combined);
-		debugRenderer.render(world, camera.combined);
+		//debugRenderer.render(world, camera.combined);
+		
+		//debug shape render
+		/*
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(1, 1, 0, 1);
+			for(CollidableEntity e : CollisionHandler.getInstance().enemyAttackList){
+				shapeRenderer.polygon(e.hitbox.get(0).getTransformedVertices());
+				//shapeRenderer.rect(e.boundingBox.x, e.boundingBox.y, e.boundingBox.width, e.boundingBox.height);
+			}
+			shapeRenderer.polygon(player.hitbox.get(0).getTransformedVertices()); 
+		shapeRenderer.end();
+		*/
 	}
 	
 }

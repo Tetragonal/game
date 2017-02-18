@@ -3,8 +3,6 @@ package com.mygdx.time.entities;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Polygon;
 import com.mygdx.time.combat.Buff;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
@@ -13,7 +11,7 @@ public class Mob extends CollidableEntity{
 
 	public MobHealthBar mobHealthBar = null;
 	
-	public boolean isSleeping;
+	public boolean isSleeping = false;
 	
 	public float health, maxHealth = 500;
 	
@@ -34,15 +32,15 @@ public class Mob extends CollidableEntity{
 		health = maxHealth;
 	}
 	
-	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, GameStage gameStage, String entityName){
-		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, gameStage, entityName);
+	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, float duration, GameStage gameStage, String entityName, boolean isAlly){
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, duration, gameStage, entityName, isAlly);
 		getStage().addActor(projectile);
 	}
 	
 	@Override
 	public void act(float delta){
 		if(mobHealthBar == null){
-			mobHealthBar = new MobHealthBar(body.getPosition().x, body.getPosition().y-sprite.getHeight() +1, this);
+			mobHealthBar = new MobHealthBar(getX(), getY()-sprite.getHeight() +1, this);
 		}
 		if(!isSleeping){
 			super.act(delta);

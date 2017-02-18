@@ -11,7 +11,6 @@ public enum LevelScreenEnum {
 			mapOne.musicVolume = 0.2f;
 			mapOne.startX = 5;
 			mapOne.startY = 2;
-			mapOne.show();
 			return mapOne;
 		}
 	},

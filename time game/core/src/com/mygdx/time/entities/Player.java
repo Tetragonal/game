@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -63,6 +62,7 @@ public class Player extends Mob{
 		
 		//test
 		CollisionHandler.getInstance().allyMobList.add(this);
+		System.out.println("added");
 		Buff healthRegenBuff = new Buff();
 		healthRegenBuff.damagePerTick=-20/Game.ENGINE_FPS;
 		this.addBuff(healthRegenBuff);
@@ -87,7 +87,7 @@ public class Player extends Mob{
  	    if(testProj2Boolean == true && testProj2Count > 0){
  	    	testProj2Delay += delta;
  	    	if(testProj2Delay > .075){
- 	    		fireProjectile(0,0,20,50,testProj2FireAngle, gameStage, "PLAYER_LASER");
+ 	    		fireProjectile(0,0,20,50,testProj2FireAngle,3,gameStage,"PLAYER_LASER", true);
  	    		testProj2Delay = 0;
  				testProj2Count--;
  	    	}
@@ -107,10 +107,8 @@ public class Player extends Mob{
 						tpSound.play();
 						setX(positionLog.get(rewindSpot)[0]);
 						setY(positionLog.get(rewindSpot)[1]);
-						worldDestination.x = body.getPosition().x + body.getLocalCenter().x;
-						worldDestination.y = body.getPosition().y + body.getLocalCenter().y;
-						body.setTransform(positionLog.get(rewindSpot)[0], positionLog.get(rewindSpot)[1], 0);
-						body.setLinearVelocity(0, 0);
+						worldDestination.x = getX() + sprite.getWidth()/2;
+						worldDestination.y = getY() + sprite.getHeight()/2;
 						positionLog.clear();
 						secondTimer = 0;
 						canTeleport = false;
@@ -156,7 +154,7 @@ public class Player extends Mob{
     	    float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
     		if(testProjSpawn > .25){
     			for(int i=0; i<5; i++){
-        			fireProjectile(0, 0, 15, 10, fireAngle-12+i*6, gameStage, "PLAYER_LASER");
+        			fireProjectile(0, 0, 15, 10, fireAngle-12+i*6, 3,gameStage, "PLAYER_LASER", true);
     			}
     			testProjSpawn = 0;
     		}
@@ -173,10 +171,12 @@ public class Player extends Mob{
 	}
 	
 	private void playWalkSound(){
+		/*
 		if(body.getLinearVelocity().x != 0 && body.getLinearVelocity().y != 0 && !walkSound.isPlaying()){
 			walkSound.play();
 		}else if (body.getLinearVelocity().x == 0 && body.getLinearVelocity().y == 0 && walkSound.isPlaying()){
 			walkSound.pause();
 		}
+		*/
 	}
 }

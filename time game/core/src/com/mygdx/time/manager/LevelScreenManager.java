@@ -25,6 +25,7 @@ public class LevelScreenManager {
 	
 	/** Sets screen by searching through the enum for the keyword */
 	public void setScreen(String mapName, String previousScreen) {
+		CollisionHandler.getInstance().clearLists();
 		System.out.println(mapName + " " + previousScreen);
 		LevelScreen newScreen = LevelScreenEnum.valueOf(mapName).setScreen(previousScreen);
 		((TimeGame)Gdx.app.getApplicationListener()).setScreen(newScreen);
