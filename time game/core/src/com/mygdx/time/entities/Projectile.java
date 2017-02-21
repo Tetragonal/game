@@ -15,7 +15,7 @@ public class Projectile extends CollidableEntity{
 	private float timer = 0;
 	
 	public Projectile(float x, float y, float damage, float speed, float angleDeg, float duration, GameStage gameStage, String entityName, boolean isAlly) {
-		super(x, y, gameStage, entityName, false);
+		super(x, y, gameStage, entityName, true);
 		this.damage = damage;
 		this.duration = duration;
 		modifiedMovementSpeed = (int)speed;
@@ -55,6 +55,7 @@ public class Projectile extends CollidableEntity{
 	
 	@Override
 	public void collideWith(CollidableEntity e){
+		super.collideWith(e);
 		flagForDelete();
 		System.out.println("Proj collided");
 		if(e instanceof Mob){

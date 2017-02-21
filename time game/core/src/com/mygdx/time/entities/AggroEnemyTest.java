@@ -17,7 +17,7 @@ public class AggroEnemyTest extends WanderingEnemy{
 		
 		testProjectileSpawn += delta;
 		if(testProjectileSpawn > .1){
-			for(int i=0; i<100; i++){
+			for(int i=0; i<0; i++){
 				fireProjectile(0,0,0,6,testProjectileCounter%36*10+i*13, 3, gameStage, "ENEMY_LASER", false);
 			}
 			testProjectileCounter++;

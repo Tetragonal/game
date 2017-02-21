@@ -6,7 +6,7 @@ import com.mygdx.time.screens.GameStage;
 public class WanderingEnemy extends Mob{
 	public WanderingEnemy(float x, float y, GameStage gameStage, String entityName, boolean isAirborne) {
 		super(x, y, gameStage, entityName, isAirborne);
-		baseMovementSpeed = 3;
+		baseMovementSpeed = 0;
 	}
 
 	public void act(float delta){

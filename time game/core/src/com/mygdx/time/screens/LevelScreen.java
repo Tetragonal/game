@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -207,6 +208,8 @@ public class LevelScreen implements Screen{
 			gameStage.act();
 			uiStage.act();
 			groupActors();
+			CollisionHandler.getInstance().act();
+			Game.gameTick++;
 		}else {
 			player.walkSound.pause();
 //			inventoryWindow.setVisible(false);
@@ -214,8 +217,6 @@ public class LevelScreen implements Screen{
 		if(warpDestination != null){
 			LevelScreenManager.getInstance().setScreen(warpDestination, currentLevel);
 		}
-		CollisionHandler.getInstance().act();
-		Game.gameTick++;
 	}
 	
 	public void groupActors(){
@@ -332,12 +333,12 @@ public class LevelScreen implements Screen{
 		}
 		player = gameStage.addPlayer();
 		gameStage.addGhostKitten(player);
-		gameStage.addWanderingEntity(2, 2, "BLUE_SLIME");
-		gameStage.addWanderingEntity(4, 5, "BLUE_SLIME");
-		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
+		gameStage.addWanderingEntity(25, 40, "BLUE_SLIME");
+		//gameStage.addWanderingEntity(4, 5, "BLUE_SLIME");
+		//gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
 		gameStage.addActor(new BlizzardAoE(15, 10, gameStage, "BLIZZARD"));
 		gameStage.addActor(player);
-		for(int i=0; i<250; i++){
+		for(int i=0; i<0; i++){
 			gameStage.addWanderingEntity(player.getX(), player.getY(), "FRIENDLY_SLIME");
 		}
 		
@@ -403,17 +404,21 @@ public class LevelScreen implements Screen{
 		//debugRenderer.render(world, camera.combined);
 		
 		//debug shape render
-		/*
+		
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(1, 1, 0, 1);
 			for(CollidableEntity e : CollisionHandler.getInstance().enemyAttackList){
-				shapeRenderer.polygon(e.hitbox.get(0).getTransformedVertices());
-				//shapeRenderer.rect(e.boundingBox.x, e.boundingBox.y, e.boundingBox.width, e.boundingBox.height);
+				//shapeRenderer.polygon(e.hitbox.get(0).getTransformedVertices());
+				shapeRenderer.rect(e.boundingBox.x, e.boundingBox.y, e.boundingBox.width, e.boundingBox.height);
+			}
+			for(CollidableEntity e : CollisionHandler.getInstance().enemyMobList){
+				//shapeRenderer.polygon(e.hitbox.get(0).getTransformedVertices());
+				shapeRenderer.rect(e.boundingBox.x, e.boundingBox.y, e.boundingBox.width, e.boundingBox.height);
 			}
 			shapeRenderer.polygon(player.hitbox.get(0).getTransformedVertices()); 
 		shapeRenderer.end();
-		*/
+		
 	}
 	
 }

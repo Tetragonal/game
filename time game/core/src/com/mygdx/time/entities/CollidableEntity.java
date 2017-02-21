@@ -13,10 +13,10 @@ import com.mygdx.time.screens.GameStage;
 
 public abstract class CollidableEntity extends Entity{
 	//old Box2D collision/movement, change later (movement will be in Mob)
-	protected Vector2 direction = new Vector2();
-	protected Float moveAngle;
+	public Vector2 direction = new Vector2();
+	public Float moveAngle;
 	protected Vector2 worldDestination = new Vector2();
-	protected float modifiedMovementSpeed = 10f;
+	public float modifiedMovementSpeed = 10f;
 	protected String entityName;
 	protected boolean isAirborne;
 	
@@ -26,6 +26,8 @@ public abstract class CollidableEntity extends Entity{
 	public boolean isSolid; //whether it blocks movement on collision
 	public ArrayList<Polygon> hitbox = new ArrayList<Polygon>();
 	public Rectangle boundingBox;
+	
+	public Vector2 previousPosition = new Vector2();
 	
 	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, boolean isSensor) {
 		super(x, y, entityName);
@@ -74,7 +76,7 @@ public abstract class CollidableEntity extends Entity{
 	}
 
 	public void collideWith(CollidableEntity e){
-		
+
 	}
 	
 	public void endCollideWith(CollidableEntity e){
@@ -82,6 +84,7 @@ public abstract class CollidableEntity extends Entity{
 	}
 	
 	public void move(){
+		setPreviousPosition();
 		direction.set(worldDestination.x-this.getX()- this.getWidth()/2, worldDestination.y-this.getY() - this.getHeight()/2);
 		if(Math.abs(getX() + sprite.getWidth()/2 - worldDestination.x) < 0.1 && Math.abs(getY() + sprite.getHeight()/2 - worldDestination.y) < 0.1){
 			moveAngle = null; //cancel movement if close enough to worldDestination
@@ -93,6 +96,10 @@ public abstract class CollidableEntity extends Entity{
 	    	updateBoundingBox();
 	    }
    	
+	}
+	
+	public void setPreviousPosition(){
+		previousPosition.set(this.getX(), this.getY());
 	}
 	
 	public void updatePolygonHitbox(){
