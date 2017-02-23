@@ -22,13 +22,8 @@ public abstract class CollidableEntity extends Entity{
 	protected Body body;
 	protected String entityName;
 	protected boolean isAirborne;
-	
-	//from srugs
-	public int mask;
-	public int category;
-	public boolean isSolid; //whether it blocks movement on collision
-	public ArrayList<Polygon> hitbox = new ArrayList<Polygon>();
-	public Rectangle boundingBox;
+	public boolean isSolid;
+
 	
 	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, boolean isSensor) {
 		super(x, y, entityName);
@@ -36,12 +31,6 @@ public abstract class CollidableEntity extends Entity{
 		this.gameStage = gameStage;
 		createBody(x, y, isSensor);
 		isSolid = !isSensor;
-		
-		boundingBox = sprite.getBoundingRectangle();
-		hitbox.add(new Polygon(new float[]{x,y, x+sprite.getWidth(),y, x+sprite.getWidth(),y+sprite.getHeight(), x,y+sprite.getHeight()}));
-		for(Polygon p : hitbox){
-			boundingBox.merge(p.getBoundingRectangle());
-		}
 	}
 	
 	public void createBody(float x, float y, boolean isSensor){
@@ -66,15 +55,11 @@ public abstract class CollidableEntity extends Entity{
 		
 		Filter f = new Filter();
 	    f.categoryBits = EntityEnum.valueOf(entityName).getCategory();
-	    category = EntityEnum.valueOf(entityName).getCategory();
 	    f.maskBits = EntityEnum.valueOf(entityName).getMask();
-	    mask = EntityEnum.valueOf(entityName).getMask();
     	if(isAirborne){
     		f.maskBits = (short) (f.maskBits | Game.MASK_AIRBORNE);
-    		mask = (short) (f.maskBits | Game.MASK_AIRBORNE);
     	}else{
     		f.maskBits = (short) (f.maskBits | Game.MASK_GROUNDED);
-    		mask = (short) (f.maskBits | Game.MASK_GROUNDED);
     	}
 		
 		for(int i=0; i<body.getFixtureList().size; i++){

@@ -1,7 +1,5 @@
 package com.mygdx.time.entities;
 
-import com.mygdx.time.combat.Buff;
-import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
 public class AggroEnemyTest extends WanderingEnemy{

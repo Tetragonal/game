@@ -3,7 +3,6 @@ package com.mygdx.time.entities;
 import com.badlogic.gdx.math.MathUtils;
 import com.mygdx.time.combat.Buff;
 import com.mygdx.time.combat.DamageCalculator;
-import com.mygdx.time.manager.CollisionHandler;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
@@ -28,8 +27,6 @@ public class Projectile extends CollidableEntity{
 		float radians = angleDeg*MathUtils.degreesToRadians;
 		body.setTransform(x+(float)Math.sin(radians)*sprite.getHeight()/2, y-(float)Math.cos(radians)*sprite.getHeight()/2, radians);
 		body.setLinearVelocity(modifiedMovementSpeed*MathUtils.cosDeg(angleDeg), modifiedMovementSpeed*MathUtils.sinDeg(angleDeg));
-		//testing
-		CollisionHandler.getInstance().enemyAttackList.add(this);
 		
 	}
 

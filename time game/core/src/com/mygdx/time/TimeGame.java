@@ -21,8 +21,6 @@ public class TimeGame extends Game {
 		Texture.setAssetManager(assets);
 		
 		batch = new SpriteBatch();
-//		setScreen(new Sandbox("map_1", "Sandbox"));
-//		setScreen(new MapTwo("map_1", "map_2"));
 		LevelScreenManager.getInstance().setScreen("map_1", "map_2");
 	}
 

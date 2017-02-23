@@ -39,7 +39,6 @@ import com.mygdx.time.entities.Entity;
 import com.mygdx.time.entities.EntityEnum;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.inventory.InventoryWindow;
-import com.mygdx.time.manager.CollisionHandler;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
 import com.mygdx.time.map.Game;
@@ -67,6 +66,8 @@ public class LevelScreen implements Screen{
 	private OrthogonalTiledMapRenderer renderer;
 	private OrthographicCamera camera;
 	private FitViewport viewport;
+	
+	private int cameraType = 1;
 	
 	private BitmapFont font = new BitmapFont(); //temporary
 	private Matrix4 uiMatrix = new Matrix4();
@@ -149,9 +150,16 @@ public class LevelScreen implements Screen{
 		
 	    float frameTime = delta;// = Math.min(delta, 0.25f);
 		gameTimer += frameTime;
-		while(gameTimer >= 1/Game.ENGINE_FPS){
+		if(gameTimer >= 1/Game.ENGINE_FPS){
 			act();
 			gameTimer -= 1/Game.ENGINE_FPS;
+		}
+		if(gameTimer >= 1/Game.ENGINE_FPS && delta<1/Game.ENGINE_FPS/2){
+			act();
+			gameTimer -= 1/Game.ENGINE_FPS;
+		}
+		if(Game.gameTick%60==0){
+			System.out.println(gameStage.getActors().size);
 		}
 		
 		updateCamera();
@@ -159,12 +167,29 @@ public class LevelScreen implements Screen{
 	}
 
 	public void updateCamera(){
-		//center camera on player
-		//Camera centered on you only
-			//camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
-		//Camera follows you
-			camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)), (float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)), 0);
-		//TODO Camera follows the midpoint between your pressed cursor and your character
+		switch(cameraType){
+			case 0:
+				//center camera on player
+				camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
+				break;
+			case 1:
+				//Camera follows you
+				camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)),
+						(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)),
+						0);
+				break;
+			case 2:
+				//Camera follows the midpoint between your cursor and your character
+				camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)+0.01/Game.PPM*(Gdx.input.getX()-Gdx.graphics.getWidth()/2)),
+						(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)-0.01/Game.PPM*(Gdx.input.getY()-Gdx.graphics.getHeight()/2)),
+						0);
+				break;
+			case 3:
+				//TODO Camera follows the midpoint between your (pressed) cursor and your character
+				break;
+			default:
+				break;
+		}
 		camera.update();
 	}
 	
@@ -176,6 +201,7 @@ public class LevelScreen implements Screen{
 			gameStage.act();
 			uiStage.act();
 			groupActors();
+			Game.gameTick++;
 		}else {
 			player.walkSound.pause();
 //			inventoryWindow.setVisible(false);
@@ -183,8 +209,6 @@ public class LevelScreen implements Screen{
 		if(warpDestination != null){
 			LevelScreenManager.getInstance().setScreen(warpDestination, currentLevel);
 		}
-		CollisionHandler.getInstance().act();
-		Game.gameTick++;
 	}
 	
 	public void groupActors(){
@@ -277,16 +301,25 @@ public class LevelScreen implements Screen{
 	
 	private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
-            camera.zoom += 0.005; //0.005
+            camera.zoom += 0.01; //0.005
         }
         if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
-            camera.zoom -= 0.005;
+            camera.zoom -= 0.01;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             player.takeDamage(5);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.getHealth() > 0) {
             player.heal(5);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            cameraType = 0;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        	cameraType = 1;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+        	cameraType = 2;
         }
         camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 1000/camera.viewportWidth/Game.PPM);
 	}
@@ -302,7 +335,9 @@ public class LevelScreen implements Screen{
 		player = gameStage.addPlayer();
 		gameStage.addGhostKitten(player);
 		gameStage.addWanderingEntity(2, 2, "BLUE_SLIME");
-		gameStage.addWanderingEntity(4, 5, "BLUE_SLIME");
+		for(int i=0; i<100; i++){
+			gameStage.addWanderingEntity(24, 50, "FRIENDLY_SLIME");
+		}
 		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
 		gameStage.addActor(new BlizzardAoE(15, 10, gameStage, "BLIZZARD"));
 		gameStage.addActor(player);
@@ -361,11 +396,12 @@ public class LevelScreen implements Screen{
 			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp), Right click - shotgun, Middle click - burst", 10, 15);
 			font.draw(TimeGame.batch, Game.console, 10, 700);
 			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
-		TimeGame.batch.end();
+			font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);
+			TimeGame.batch.end();
 		uiStage.draw();
 		
 		TimeGame.batch.setProjectionMatrix(camera.combined);
-		//debugRenderer.render(world, camera.combined);
+		debugRenderer.render(world, camera.combined);
 	}
 	
 }

@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.combat.Buff;
-import com.mygdx.time.manager.CollisionHandler;
 import com.mygdx.time.map.Game;
 import com.mygdx.time.screens.GameStage;
 
@@ -62,7 +61,6 @@ public class Player extends Mob{
 		baseMovementSpeed = 8;
 		
 		//test
-		CollisionHandler.getInstance().allyMobList.add(this);
 		Buff healthRegenBuff = new Buff();
 		healthRegenBuff.damagePerTick=-20/Game.ENGINE_FPS;
 		this.addBuff(healthRegenBuff);

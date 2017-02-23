@@ -33,7 +33,7 @@ public class Mob extends CollidableEntity{
 	}
 	
 	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, GameStage gameStage, String entityName){
-		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 3, gameStage, entityName);
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 10, gameStage, entityName);
 		getStage().addActor(projectile);
 	}
 	
@@ -74,8 +74,6 @@ public class Mob extends CollidableEntity{
 	public void addBuff(Buff buff){
 		buffList.add(buff);
 		recalculateStats();
-		System.out.println("Added buff");
-		System.out.println(buffList.get(0).percentMovementSpeed);
 	}
 	
 	public void removeBuff(Buff buff){

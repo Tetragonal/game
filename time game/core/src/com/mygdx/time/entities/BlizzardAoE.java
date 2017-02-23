@@ -16,7 +16,6 @@ public class BlizzardAoE extends CollidableEntity{
 	public BlizzardAoE(float x, float y, GameStage gameStage, String entityName) {
 		super(x, y, gameStage, entityName, true);
 		// TODO Auto-generated constructor stub
-		body.applyLinearImpulse(10, 0, body.getPosition().x + body.getLocalCenter().x, body.getPosition().y + body.getLocalCenter().y, true);
 		modifiedMovementSpeed = 0;
 	}
 	
@@ -66,15 +65,12 @@ public class BlizzardAoE extends CollidableEntity{
 		
 		Filter f = new Filter();
 	    f.categoryBits = EntityEnum.valueOf(entityName).getCategory();
-	    category = EntityEnum.valueOf(entityName).getCategory();
 	    f.maskBits = EntityEnum.valueOf(entityName).getMask();
-	    mask = EntityEnum.valueOf(entityName).getMask();
     	if(isAirborne){
     		f.maskBits = (short) (f.maskBits | Game.MASK_AIRBORNE);
-    		mask = (short) (f.maskBits | Game.MASK_AIRBORNE);
     	}else{
     		f.maskBits = (short) (f.maskBits | Game.MASK_GROUNDED);
-    		mask = (short) (f.maskBits | Game.MASK_GROUNDED);
+
     	}
 		
 		for(int i=0; i<body.getFixtureList().size; i++){

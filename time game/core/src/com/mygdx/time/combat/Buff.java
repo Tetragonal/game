@@ -5,7 +5,7 @@ import com.mygdx.time.map.Game;
 public class Buff {
 	public int startTick;
 	public int endTick;
-	public boolean isPermanent;
+	public boolean isPermanent = false;
 	
 	public int flatArmor;
 	public double percentArmor;
@@ -26,6 +26,8 @@ public class Buff {
 	public double percentAttack;
 	
 	public double damagePerTick;
+	
+	public boolean isVisible = false;
 	
 	public Buff(int duration){		
 		startTick = Game.gameTick;
