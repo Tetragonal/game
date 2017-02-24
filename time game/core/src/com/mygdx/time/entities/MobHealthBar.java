@@ -14,24 +14,24 @@ public class MobHealthBar extends Entity{
 	private Sprite bgSprite;
 
 	
-	public MobHealthBar(float x, float y, Mob parentMob) {
-		super(x, y, (Texture)TimeGame.assets.get("img/whitePixel.png"));
+	public MobHealthBar(Mob parentMob) {
+		super(parentMob.getX(), parentMob.getY(), (Texture)TimeGame.assets.get("img/whitePixel.png"));
 		this.parentMob = parentMob;
 		parentMob.attachedEntities.add(this);
 		parentMob.getStage().addActor(this);
 		
 		Texture texture = TimeGame.assets.get("img/whitePixel.png");
 		bgSprite = new Sprite(texture);
-		bgSprite.setBounds(x/Game.PPM, y/Game.PPM, sprite.getWidth()/Game.PPM, sprite.getHeight()/Game.PPM);
+		bgSprite.setBounds(parentMob.getX(), parentMob.getY(), sprite.getWidth()/Game.PPM, sprite.getHeight()/Game.PPM);
 		bgSprite.setColor(Color.RED);
 
 		sprite.setColor(Color.GREEN);
-		this.setSize(parentMob.getSprite().getWidth(), parentMob.getSprite().getWidth()/10);
+		this.setSize(parentMob.sprite.getWidth(), parentMob.sprite.getWidth()/10);
 		
-		float spriteSize = parentMob.getSprite().getWidth()*parentMob.getHealthPercent();
-		MathUtils.clamp(spriteSize, 0, parentMob.getSprite().getWidth());
-		sprite.setSize(spriteSize, parentMob.getSprite().getWidth()/10);
-		bgSprite.setSize(parentMob.getSprite().getWidth()*parentMob.getHealthPercent(), parentMob.getSprite().getWidth()/10);
+		float spriteSize = parentMob.sprite.getWidth()*parentMob.getHealthPercent();
+		MathUtils.clamp(spriteSize, 0, parentMob.sprite.getWidth());
+		sprite.setSize(spriteSize, parentMob.sprite.getWidth()/10);
+		bgSprite.setSize(parentMob.sprite.getWidth()*parentMob.getHealthPercent(), parentMob.sprite.getWidth()/10);
 	}
 	
 	@Override
@@ -52,9 +52,9 @@ public class MobHealthBar extends Entity{
 	
 	public void act(float delta){
 		super.act(delta);
-		this.setPosition(parentMob.getBody().getPosition().x, parentMob.getBody().getPosition().y+parentMob.getSprite().getHeight()*1.1f);
-		float spriteSize = MathUtils.clamp(parentMob.getSprite().getWidth()*parentMob.getHealthPercent(), 0, parentMob.getSprite().getWidth());
-		sprite.setSize(spriteSize, parentMob.getSprite().getWidth()/10);
+		this.setPosition(parentMob.getBody().getPosition().x, parentMob.getBody().getPosition().y+parentMob.sprite.getHeight()*1.1f);
+		float spriteSize = MathUtils.clamp(parentMob.sprite.getWidth()*parentMob.getHealthPercent(), 0, parentMob.sprite.getWidth());
+		sprite.setSize(spriteSize, parentMob.sprite.getWidth()/10);
 		
 		if(parentMob.getHealth() <= 0){
 			this.isFlaggedForDelete = true;

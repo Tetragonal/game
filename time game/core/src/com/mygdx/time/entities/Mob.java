@@ -20,7 +20,7 @@ public class Mob extends CollidableEntity{
 	public int baseIceResist, modifiedIceResist;
 	public int baseLightningResist, modifiedLightningResist;
 	
-	public int baseMovementSpeed = 10;
+	public float baseMovementSpeed = 10;
 	public int baseAttack, modifiedAttack;
 	
 	ArrayList<Buff> buffList = new ArrayList<Buff>();
@@ -40,7 +40,7 @@ public class Mob extends CollidableEntity{
 	@Override
 	public void act(float delta){
 		if(mobHealthBar == null){
-			mobHealthBar = new MobHealthBar(body.getPosition().x, body.getPosition().y-sprite.getHeight() +1, this);
+			mobHealthBar = new MobHealthBar(this);
 		}
 		if(!isSleeping){
 			super.act(delta);
@@ -90,7 +90,7 @@ public class Mob extends CollidableEntity{
 		int percentIceResist = 0;
 		int flatLightningResist = baseLightningResist;
 		int percentLightningResist = 0;
-		int flatMovementSpeed = baseMovementSpeed;
+		float flatMovementSpeed = baseMovementSpeed;
 		int percentMovementSpeed = 0;
 		int flatAttack = baseAttack;
 		int percentAttack = 0;
@@ -114,7 +114,7 @@ public class Mob extends CollidableEntity{
 		modifiedFireResist = (int)(flatFireResist * (1+percentFireResist/100.0));
 		modifiedIceResist = (int)(flatIceResist * (1+percentIceResist/100.0));;
 		modifiedLightningResist = (int)(flatLightningResist * (1+percentLightningResist/100.0));;
-		modifiedMovementSpeed = (int)(flatMovementSpeed * (1+percentMovementSpeed/100.0));
+		modifiedMovementSpeed = (float) (flatMovementSpeed * (1+percentMovementSpeed/100.0));
 	}
 	
 	private void handleBuffs(){

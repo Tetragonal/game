@@ -158,10 +158,7 @@ public class LevelScreen implements Screen{
 			act();
 			gameTimer -= 1/Game.ENGINE_FPS;
 		}
-		if(Game.gameTick%60==0){
-			System.out.println(gameStage.getActors().size);
-		}
-		
+
 		updateCamera();
 		drawScreen();
 	}
@@ -169,7 +166,7 @@ public class LevelScreen implements Screen{
 	public void updateCamera(){
 		switch(cameraType){
 			case 0:
-				//center camera on player
+				//Camera centered on you
 				camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
 				break;
 			case 1:
@@ -185,8 +182,20 @@ public class LevelScreen implements Screen{
 						0);
 				break;
 			case 3:
-				//TODO Camera follows the midpoint between your (pressed) cursor and your character
+				//Camera follows the midpoint between your pressed cursor and your character
+				if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+					camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)+0.01/Game.PPM*(Gdx.input.getX()-Gdx.graphics.getWidth()/2)),
+							(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)-0.01/Game.PPM*(Gdx.input.getY()-Gdx.graphics.getHeight()/2)),
+							0);
+				}
+				else{
+					camera.position.set((float) (camera.position.x + .05f*(Game.CAMERA_OFFSET_X/2f*camera.zoom-camera.position.x + player.getX() + player.getWidth()/2f)),
+							(float) (camera.position.y + .05*(-camera.position.y + player.getY() + player.getHeight()/2f)),
+							0);
+				}
 				break;
+			case 4:
+				//Fixed camera
 			default:
 				break;
 		}
@@ -321,6 +330,12 @@ public class LevelScreen implements Screen{
         if (Gdx.input.isKeyPressed(Input.Keys.E)) {
         	cameraType = 2;
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+        	cameraType = 3;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.T)) {
+        	cameraType = 4;
+        }
         camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 1000/camera.viewportWidth/Game.PPM);
 	}
 
@@ -335,7 +350,7 @@ public class LevelScreen implements Screen{
 		player = gameStage.addPlayer();
 		gameStage.addGhostKitten(player);
 		gameStage.addWanderingEntity(2, 2, "BLUE_SLIME");
-		for(int i=0; i<100; i++){
+		for(int i=0; i<0; i++){
 			gameStage.addWanderingEntity(24, 50, "FRIENDLY_SLIME");
 		}
 		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
@@ -359,6 +374,10 @@ public class LevelScreen implements Screen{
 		TimeGame.assets.load("img/laser2.png", Texture.class);
 		TimeGame.assets.load("img/whitePixel.png", Texture.class);
 		TimeGame.assets.load("img/blizzard.png", Texture.class);
+		TimeGame.assets.load("img/slash.png", Texture.class);
+		TimeGame.assets.load("img/blade.png", Texture.class);
+		TimeGame.assets.load("img/mark.png", Texture.class);
+		TimeGame.assets.load("img/frostExplosion.png", Texture.class);
 
 		TimeGame.assets.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 		TimeGame.assets.load(mapFile, TiledMap.class);
@@ -393,7 +412,7 @@ public class LevelScreen implements Screen{
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		TimeGame.batch.setProjectionMatrix(uiMatrix);
 		TimeGame.batch.begin();
-			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory (copy pasted from somewhere),  -/+ to zoom camera, <- -> to change hp(temp), Right click - shotgun, Middle click - burst", 10, 15);
+			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory(not functional),  -/+ to zoom camera, <- -> to change hp, Right click-shotgun, Middle click-burst, QWERT-change camera, A-slash", 10, 15);
 			font.draw(TimeGame.batch, Game.console, 10, 700);
 			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
 			font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);
@@ -401,7 +420,7 @@ public class LevelScreen implements Screen{
 		uiStage.draw();
 		
 		TimeGame.batch.setProjectionMatrix(camera.combined);
-		debugRenderer.render(world, camera.combined);
+		//debugRenderer.render(world, camera.combined);
 	}
 	
 }

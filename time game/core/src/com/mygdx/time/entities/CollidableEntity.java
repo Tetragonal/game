@@ -23,7 +23,6 @@ public abstract class CollidableEntity extends Entity{
 	protected String entityName;
 	protected boolean isAirborne;
 	public boolean isSolid;
-
 	
 	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, boolean isSensor) {
 		super(x, y, entityName);
@@ -46,7 +45,7 @@ public abstract class CollidableEntity extends Entity{
 
 		body = gameStage.getWorld().createBody(bd);
 		
-		gameStage.getLoader().attachFixture(body, EntityEnum.valueOf(entityName).getPhysicsName(), fd, 2f);
+		gameStage.getLoader().attachFixture(body, EntityEnum.valueOf(entityName).getPhysicsName(), fd, sprite.getWidth());
 		body.setUserData(this);
 	    body.setTransform(x, y, 0);
 	    body.setFixedRotation(true);

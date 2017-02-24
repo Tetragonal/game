@@ -14,13 +14,14 @@ import com.mygdx.time.screens.GameStage;
 
 public abstract class Entity extends Actor{
 
-	protected Sprite sprite;
 	protected GameStage gameStage;
+	
+	public Sprite sprite;
 	public boolean isFlaggedForDelete = false;
 	
 	//from srugs
-	Vector2 position;
-	double rotation;
+	//Vector2 position;
+	//double rotation;
 	protected ArrayList<Entity> attachedEntities = new ArrayList<Entity>();
 	
 	public Entity(float x, float y, Texture texture){
@@ -32,8 +33,8 @@ public abstract class Entity extends Actor{
 	}
 	
 	public Entity(float x, float y, String entityName){
-		Texture t = TimeGame.assets.get(EntityEnum.valueOf(entityName).getTextureFile());
-		this.sprite = new Sprite(t);
+		Texture texture = TimeGame.assets.get(EntityEnum.valueOf(entityName).getTextureFile());
+		this.sprite = new Sprite(texture);
 		sprite.setBounds(x/Game.PPM, y/Game.PPM, sprite.getWidth()/Game.PPM, sprite.getHeight()/Game.PPM);
 		setBounds(x,y,sprite.getWidth(),sprite.getHeight());
 		setTouchable(Touchable.enabled);
@@ -50,8 +51,5 @@ public abstract class Entity extends Actor{
 		sprite.setPosition(getX(),getY());
 		super.positionChanged();	
 	}
-	
-	public Sprite getSprite(){
-		return sprite;
-	}
+
 }
