@@ -1,5 +1,7 @@
 package com.mygdx.time.entities;
 
+import com.badlogic.gdx.audio.Sound;
+import com.mygdx.time.TimeGame;
 import com.mygdx.time.map.Game;
 
 public class SlashAttack extends Attack{
@@ -57,5 +59,10 @@ public class SlashAttack extends Attack{
 	    	this.isFlaggedForDelete = true;
 	    }
 	}
-
+	
+	@Override
+	public void collideWith(CollidableEntity e){
+		super.collideWith(e);
+		((Sound) TimeGame.assets.get("sound/warp2.ogg")).play();
+	}
 }

@@ -2,9 +2,6 @@ package com.mygdx.time.entities;
 
 import java.util.HashSet;
 
-import com.badlogic.gdx.audio.Sound;
-import com.mygdx.time.TimeGame;
-
 public class Attack extends CollidableEntity{
 	Entity parentEntity;
 	float damage;
@@ -19,8 +16,6 @@ public class Attack extends CollidableEntity{
 		if(e instanceof Mob && !collidedEntities.contains(e)){
 			collidedEntities.add(e);
 			((Mob) e).takeDamage(damage);
-			Sound tpSound = TimeGame.assets.get("sound/warp2.ogg");
-			tpSound.play();
 		}
 	}
 	

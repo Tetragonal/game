@@ -176,7 +176,6 @@ public class Player extends Mob{
     	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
     	    getStage().getCamera().unproject(worldCoordinates);
         	float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
-        	System.out.println(fireAngle);
         	SlashAttack slash = new SlashAttack(1.5f,0,fireAngle,720,120, 100, "TEST_SWORD", this);
         	getStage().addActor(slash);
         }

@@ -367,6 +367,7 @@ public class LevelScreen implements Screen{
 		TimeGame.assets.load("img/kittenTransparent3.png", Texture.class); //player
 		TimeGame.assets.load("sound/walksound.mp3", Music.class);
 		TimeGame.assets.load("sound/warp2.ogg", Sound.class);
+		TimeGame.assets.load("sound/frost.wav", Sound.class);
 		TimeGame.assets.load(EntityEnum.valueOf("BLUE_SLIME").getTextureFile(), Texture.class); //temp sprite loading
 		TimeGame.assets.load(EntityEnum.valueOf("GHOST_KITTEN").getTextureFile(), Texture.class);
 		TimeGame.assets.load("img/laser.png", Texture.class); //projectile
@@ -412,7 +413,7 @@ public class LevelScreen implements Screen{
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		TimeGame.batch.setProjectionMatrix(uiMatrix);
 		TimeGame.batch.begin();
-			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory(not functional),  -/+ to zoom camera, <- -> to change hp, Right click-shotgun, Middle click-burst, QWERT-change camera, A-slash", 10, 15);
+			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory(not functional),  -/+ to zoom camera, <- -> to change hp, Right click-shotgun, Middle click-burst, QWERT-change camera, A-slash, D-Frost Explosion", 10, 15);
 			font.draw(TimeGame.batch, Game.console, 10, 700);
 			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
 			font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);

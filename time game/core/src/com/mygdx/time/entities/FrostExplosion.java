@@ -1,8 +1,8 @@
 package com.mygdx.time.entities;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.combat.Buff;
 import com.mygdx.time.map.Game;
@@ -36,6 +36,7 @@ public class FrostExplosion extends Attack{
 			setSize(sprite.getWidth(), sprite.getHeight());
 			stage = 1;
 			createBody(this.getX()-sprite.getWidth()/2, this.getY(), true);
+			((Sound) TimeGame.assets.get("sound/frost.wav")).play();
 		}
 		if(Game.gameTick > startTick+delay+duration){
 			isFlaggedForDelete = true;

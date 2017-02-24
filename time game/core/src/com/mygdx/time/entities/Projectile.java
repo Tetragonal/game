@@ -46,7 +46,6 @@ public class Projectile extends CollidableEntity{
 	@Override
 	public void collideWith(CollidableEntity e){
 		this.isFlaggedForDelete = true;
-		System.out.println("Proj collided");
 		if(e instanceof Mob){
 			((Mob)e).takeDamage(DamageCalculator.calculateDamage((Mob)e, DamageCalculator.PHYSICAL, damage));
 			Buff b = new Buff(60*10);
