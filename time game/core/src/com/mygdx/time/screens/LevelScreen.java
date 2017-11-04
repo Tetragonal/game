@@ -1,5 +1,7 @@
 package com.mygdx.time.screens;
 
+import java.util.HashSet;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -32,19 +34,17 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.time.Game;
 import com.mygdx.time.TimeGame;
-import com.mygdx.time.entities.BlizzardAoE;
 import com.mygdx.time.entities.CollidableEntity;
 import com.mygdx.time.entities.Entity;
-import com.mygdx.time.entities.EntityEnum;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.inventory.InventoryWindow;
+import com.mygdx.time.manager.EntityLoader;
 import com.mygdx.time.manager.LevelScreenManager;
 import com.mygdx.time.manager.MusicManager;
-import com.mygdx.time.map.Game;
 import com.mygdx.time.map.MapLoader;
 import com.mygdx.time.map.TestContactListener;
-
 
 public class LevelScreen implements Screen{
 	
@@ -78,6 +78,8 @@ public class LevelScreen implements Screen{
 	private World world;
 	Box2DDebugRenderer debugRenderer;
 	
+	HashSet<String> mobSpriteSet = new HashSet<String>();
+	
 	private Group groundedGroup = new Group(), aerialGroup = new Group(), miscGroup = new Group();
 	
 	public LevelScreen(String previousLevel, String currentLevel, String mapFile){
@@ -88,16 +90,15 @@ public class LevelScreen implements Screen{
 	
 	@Override
 	public void show() {
-		loadAssets();
+		TimeGame.assets.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+		TimeGame.assets.load(mapFile, TiledMap.class);
+		TimeGame.assets.finishLoading();
 		
 		Box2D.init();
 		
 		debugRenderer = new Box2DDebugRenderer();
 		world = new World(new Vector2(0,0), true);
 		world.setContactListener(new TestContactListener(this));
-
-		Skin menuSkin = TimeGame.assets.get("ui/menuSkin.json");
-//		Skin uiSkin = TimeGame.assets.get("temp inventory resources/skins/uiskin.json");
 		
 		map = TimeGame.assets.get(mapFile);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f/Game.PPM);
@@ -110,7 +111,12 @@ public class LevelScreen implements Screen{
 		gameStage.addActor(groundedGroup);
 		gameStage.addActor(aerialGroup);
 		gameStage.addActor(miscGroup);
+		
+		loadAssets();
 		addEntities();
+
+		Skin menuSkin = TimeGame.assets.get("ui/menuSkin.json");
+//		Skin uiSkin = TimeGame.assets.get("temp inventory resources/skins/uiskin.json");
 		
 		//set music
 		if(musicFile != null){
@@ -148,7 +154,8 @@ public class LevelScreen implements Screen{
 		Gdx.gl.glClearColor(0,0,0,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-	    float frameTime = delta;// = Math.min(delta, 0.25f);
+		//if behind, tries to catch up by running 2 frames at once
+	    float frameTime = delta;
 		gameTimer += frameTime;
 		if(gameTimer >= 1/Game.ENGINE_FPS){
 			act();
@@ -158,7 +165,7 @@ public class LevelScreen implements Screen{
 			act();
 			gameTimer -= 1/Game.ENGINE_FPS;
 		}
-
+		
 		updateCamera();
 		drawScreen();
 	}
@@ -295,6 +302,10 @@ public class LevelScreen implements Screen{
 		
 		font.dispose(); //temporary
 		
+		for(String spritePath : mobSpriteSet){
+			TimeGame.assets.unload(spritePath);
+		}
+		
 		TimeGame.assets.unload("sound/walksound.mp3");
 		TimeGame.assets.unload("sound/warp2.ogg");
 		TimeGame.assets.unload("img/laser.png"); //projectile
@@ -302,8 +313,7 @@ public class LevelScreen implements Screen{
 		TimeGame.assets.unload("ui/menuSkin.json"); //crappy ui
 		TimeGame.assets.unload("temp inventory resources/skins/uiskin.json"); //temporary inventory
 		TimeGame.assets.unload("temp inventory resources/icons/icons.atlas"); //temporary inventory
-		TimeGame.assets.unload(EntityEnum.valueOf("BLUE_SLIME").getTextureFile()); //temp sprite loading
-		TimeGame.assets.unload(EntityEnum.valueOf("GHOST_KITTEN").getTextureFile());
+		TimeGame.assets.unload("img/" + EntityLoader.getValue("GhostKitten", "sprite", Game.MOB) + ".png");
 		TimeGame.assets.unload("img/laser2.png");
 		TimeGame.assets.unload("img/whitePixel.png");
 	}
@@ -336,7 +346,7 @@ public class LevelScreen implements Screen{
         if (Gdx.input.isKeyPressed(Input.Keys.T)) {
         	cameraType = 4;
         }
-        camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 1000/camera.viewportWidth/Game.PPM);
+        camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 2000/camera.viewportWidth/Game.PPM);
 	}
 
 	private void addEntities(){
@@ -347,29 +357,39 @@ public class LevelScreen implements Screen{
 				startY = rectangleObject.getRectangle().y;
 			}
 		}
+		
+		MapObjects mobObjects = map.getLayers().get(Game.MOB_LAYER).getObjects();
+		for (RectangleMapObject rectangleObject : mobObjects.getByType(RectangleMapObject.class)) { //load spawn
+			gameStage.addMob(rectangleObject.getRectangle().x/Game.PPM, rectangleObject.getRectangle().y/Game.PPM, rectangleObject.getName());
+		}
+		
 		player = gameStage.addPlayer();
 		gameStage.addGhostKitten(player);
-		gameStage.addWanderingEntity(2, 2, "BLUE_SLIME");
-		for(int i=0; i<0; i++){
-			gameStage.addWanderingEntity(24, 50, "FRIENDLY_SLIME");
-		}
-		gameStage.addAggroEnemyTest(4, 4, "BLUE_SLIME");
-		gameStage.addActor(new BlizzardAoE(15, 10, gameStage, "BLIZZARD"));
-		gameStage.addActor(player);
 		
 		gameStage.setKeyboardFocus(player);
 	}
 	
 	private void loadAssets(){
+		//load mobs
+		MapObjects mobObjects = map.getLayers().get(Game.MOB_LAYER).getObjects();
+		for (RectangleMapObject rectangleObject : mobObjects.getByType(RectangleMapObject.class)) {
+			mobSpriteSet.add("img/" + EntityLoader.getValue(rectangleObject.getName(), "sprite", Game.MOB) + ".png");
+		}
+		
+		//load mob sprites
+		for(String spritePath : mobSpriteSet){
+			TimeGame.assets.load(spritePath, Texture.class);
+		}
+		
 		TimeGame.assets.load("temp inventory resources/skins/uiskin.json", Skin.class); //temporary inventory
 		TimeGame.assets.load("temp inventory resources/icons/icons.atlas", TextureAtlas.class); //temporary inventory
 		TimeGame.assets.load("ui/menuSkin.json", Skin.class, new SkinLoader.SkinParameter("ui/atlas.pack")); //ui config
 		TimeGame.assets.load("img/kittenTransparent3.png", Texture.class); //player
 		TimeGame.assets.load("sound/walksound.mp3", Music.class);
+		TimeGame.assets.load("sound/flask.mp3", Sound.class);
 		TimeGame.assets.load("sound/warp2.ogg", Sound.class);
 		TimeGame.assets.load("sound/frost.wav", Sound.class);
-		TimeGame.assets.load(EntityEnum.valueOf("BLUE_SLIME").getTextureFile(), Texture.class); //temp sprite loading
-		TimeGame.assets.load(EntityEnum.valueOf("GHOST_KITTEN").getTextureFile(), Texture.class);
+		TimeGame.assets.load("img/" + EntityLoader.getValue("GhostKitten", "sprite", Game.MOB) + ".png", Texture.class);
 		TimeGame.assets.load("img/laser.png", Texture.class); //projectile
 		TimeGame.assets.load("img/kittenTransparentBlue.png", Texture.class); //ghost texture
 		TimeGame.assets.load("img/laser2.png", Texture.class);
@@ -379,9 +399,7 @@ public class LevelScreen implements Screen{
 		TimeGame.assets.load("img/blade.png", Texture.class);
 		TimeGame.assets.load("img/mark.png", Texture.class);
 		TimeGame.assets.load("img/frostExplosion.png", Texture.class);
-
-		TimeGame.assets.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
-		TimeGame.assets.load(mapFile, TiledMap.class);
+		
 		TimeGame.assets.finishLoading();
 	}
 	
@@ -390,38 +408,38 @@ public class LevelScreen implements Screen{
 	}
 	
 	public void drawScreen(){
-		TimeGame.batch.setProjectionMatrix(camera.combined);
-		renderer.setView(camera);
-		
-		//draw background layers
-		renderer.render(backgroundLayers);
-		TimeGame.batch.begin();
-		//draw misc
-		miscGroup.draw(TimeGame.batch, 1);
-		//draw grounded 
-		groundedGroup.draw(TimeGame.batch, 1);
-		TimeGame.batch.end();
-		//draw foreground layers
-		renderer.render(foregroundLayers);
-		//draw aerial
-		TimeGame.batch.begin();
-		aerialGroup.draw(TimeGame.batch, 1);
-		TimeGame.batch.end();
-		
-		//draw ui
-		uiMatrix = camera.combined.cpy();
-		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		TimeGame.batch.setProjectionMatrix(uiMatrix);
-		TimeGame.batch.begin();
-			font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, V-inventory(not functional),  -/+ to zoom camera, <- -> to change hp, Right click-shotgun, Middle click-burst, QWERT-change camera, A-slash, D-Frost Explosion", 10, 15);
-			font.draw(TimeGame.batch, Game.console, 10, 700);
-			font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
-			font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);
+		if(((TimeGame)Gdx.app.getApplicationListener()).getScreen().equals(this)){
+			TimeGame.batch.setProjectionMatrix(camera.combined);
+			renderer.setView(camera);
+			//draw background layers
+			renderer.render(backgroundLayers);
+			TimeGame.batch.begin();
+			//draw grounded 
+			groundedGroup.draw(TimeGame.batch, 1);
 			TimeGame.batch.end();
-		uiStage.draw();
-		
-		TimeGame.batch.setProjectionMatrix(camera.combined);
-		//debugRenderer.render(world, camera.combined);
+			//draw foreground layers
+			renderer.render(foregroundLayers);
+			//draw aerial
+			TimeGame.batch.begin();
+			aerialGroup.draw(TimeGame.batch, 1);
+			//draw misc
+			miscGroup.draw(TimeGame.batch, 1);
+			TimeGame.batch.end();
+			//draw ui
+			uiMatrix = camera.combined.cpy();
+			uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			TimeGame.batch.setProjectionMatrix(uiMatrix);
+			TimeGame.batch.begin();
+				font.draw(TimeGame.batch, Gdx.graphics.getFramesPerSecond() + "          Controls: Z-time warp, X-flask, V-inventory(not functional),  -/+ zoom camera, <- -> change hp, Right click-shotgun, Middle click-burst, QWERT-change camera, A-slash, D-Frost Explosion", 10, 15);
+				font.draw(TimeGame.batch, Game.console, 10, 700);
+				font.draw(TimeGame.batch, "Player has " + (int)Math.ceil(player.health) + "/" + (int)player.maxHealth + " HP", 10, 670);
+				font.draw(TimeGame.batch, "Camera type: " + cameraType, 10, 640);
+				TimeGame.batch.end();
+			uiStage.draw();
+			
+			TimeGame.batch.setProjectionMatrix(camera.combined);
+			//debugRenderer.render(world, camera.combined);
+		}
 	}
 	
 }

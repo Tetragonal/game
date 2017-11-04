@@ -19,9 +19,12 @@ public class TimeGame extends Game {
 		MusicManager.getInstance();
 		
 		Texture.setAssetManager(assets);
-		
+
 		batch = new SpriteBatch();
-		LevelScreenManager.getInstance().setScreen("map_1", "map_2");
+		batch.enableBlending();
+		
+		//LevelScreenManager.getInstance().setScreen("map_1", "map_2");
+		LevelScreenManager.getInstance().setScreen("SewersMap1", "map_1");
 	}
 
 	@Override
@@ -53,5 +56,6 @@ public class TimeGame extends Game {
 		MusicManager.getInstance().dispose();
 		batch.dispose();
 		assets.dispose();
+		Gdx.app.exit(); //https://stackoverflow.com/questions/16161714/what-does-al-lib-alc-cleanup-1-device-not-closed-mean
 	}	
 }

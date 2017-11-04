@@ -12,10 +12,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.time.Game;
 import com.mygdx.time.TimeGame;
 import com.mygdx.time.combat.Buff;
-import com.mygdx.time.map.Game;
+import com.mygdx.time.combat.BuffEnum;
 import com.mygdx.time.screens.GameStage;
+
+import attacks.FrostExplosion;
+import attacks.SlashAttack;
 
 public class Player extends Mob{
 	
@@ -27,7 +31,6 @@ public class Player extends Mob{
 	public boolean acceptInput = true;
 	public float secondTimer = 0;
 	private boolean lmbHeldDown = false;
-	private float inputTimer = 0;
 	public float ghostX;
 	public float ghostY;
 	private int rewindSpot;
@@ -42,7 +45,7 @@ public class Player extends Mob{
 	private boolean testProj2Boolean = false;
 	
 	public Player(float x, float y, GameStage gameStage, String entityName){
-		super(x, y, gameStage, entityName, false);
+		super(x, y, gameStage, entityName);
 		walkSound = TimeGame.assets.get("sound/walksound.mp3");
 		tpSound = TimeGame.assets.get("sound/warp2.ogg");
 		walkSound.setVolume(0.2f);
@@ -58,12 +61,12 @@ public class Player extends Mob{
 		});
 		ghostX = x+sprite.getWidth()/2;
 		ghostY = y+sprite.getHeight()/2;
-		baseMovementSpeed = 8;
 		
 		//test
 		Buff healthRegenBuff = new Buff();
-		healthRegenBuff.damagePerTick=-20/Game.ENGINE_FPS;
+		healthRegenBuff.damagePerTick=-5/Game.ENGINE_FPS;
 		this.addBuff(healthRegenBuff);
+		
 	}
 	
 	public void act(float delta){
@@ -72,7 +75,7 @@ public class Player extends Mob{
 			handleInput(delta);
 		}
 		super.act(delta);
-		playWalkSound();
+		//playWalkSound();
 		handlePositionLog(delta);
 		
 		testProj2Refill += delta;
@@ -85,7 +88,7 @@ public class Player extends Mob{
  	    if(testProj2Boolean == true && testProj2Count > 0){
  	    	testProj2Delay += delta;
  	    	if(testProj2Delay > .075){
- 	    		fireProjectile(0,0,20,50,testProj2FireAngle, gameStage, "PLAYER_LASER");
+ 	    		fireProjectile(0,0,20,50,testProj2FireAngle, gameStage, "AllyLaser", true);
  	    		testProj2Delay = 0;
  				testProj2Count--;
  	    	}
@@ -134,31 +137,21 @@ public class Player extends Mob{
 	}
 	
 	public void handleInput(float delta){
-		inputTimer+= delta;
 		testProjSpawn += delta;
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-Game.CAMERA_OFFSET_X || lmbHeldDown == true)){
-	        	if(lmbHeldDown == false || inputTimer > .2 || Math.abs(getY()-worldDestination.y+sprite.getHeight()/2) < 1  || Math.abs(getX()-worldDestination.x+sprite.getWidth()/2) < 1){
-	        		if(inputTimer > .2)
-	        		{
-	        			inputTimer = 0;
-	        		}
-	            	lmbHeldDown = true;
-	
+        	if((Gdx.input.getX() < Gdx.graphics.getWidth()-Game.CAMERA_OFFSET_X)){
 	        	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
 	        	    getStage().getCamera().unproject(worldCoordinates);
-	
 	        	    worldDestination.set(worldCoordinates.x, worldCoordinates.y);
-	        	}
         	}
-        }else lmbHeldDown = false;
+        }
         if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
     	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
     	    getStage().getCamera().unproject(worldCoordinates);
     	    float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
     		if(testProjSpawn > .25){
     			for(int i=0; i<5; i++){
-        			fireProjectile(0, 0, 15, 10, fireAngle-12+i*6, gameStage, "PLAYER_LASER");
+        			fireProjectile(0, 0, 15, 10, fireAngle-12+i*6, gameStage, "AllyLaser", true);
     			}
     			testProjSpawn = 0;
     		}
@@ -176,18 +169,26 @@ public class Player extends Mob{
     	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
     	    getStage().getCamera().unproject(worldCoordinates);
         	float fireAngle = new Vector2(worldCoordinates.x-(sprite.getX()+sprite.getWidth()/2), worldCoordinates.y-(sprite.getY()+sprite.getHeight()/2)).angle();
-        	SlashAttack slash = new SlashAttack(1.5f,0,fireAngle,720,120, 100, "TEST_SWORD", this);
+        	SlashAttack slash = new SlashAttack(fireAngle,720,120, "TestSword", this, true);
         	getStage().addActor(slash);
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.D)){
     	    worldCoordinates.set(Gdx.input.getX(), Gdx.input.getY(),0);
     	    getStage().getCamera().unproject(worldCoordinates);
 
-        	FrostExplosion frostExplosion = new FrostExplosion(worldCoordinates.x, worldCoordinates.y, "MARK", "FROST_EXPLOSION", this);
+        	FrostExplosion frostExplosion = new FrostExplosion(worldCoordinates.x, worldCoordinates.y, "Mark", "FrostExplosion", this);
         	getStage().addActor(frostExplosion);
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.X)){
+    		Buff b = BuffEnum.valueOf("POTION_REGEN").getBuff(new String[]{Float.toString(3*Game.ENGINE_FPS),Integer.toString(100)});
+    		if(addBuff(b)){
+            	Sound s = TimeGame.assets.get("sound/flask.mp3");
+            	s.play();
+    		}
         }
 	}
 	
+	//unused
 	private void playWalkSound(){
 		if(body.getLinearVelocity().x != 0 && body.getLinearVelocity().y != 0 && !walkSound.isPlaying()){
 			walkSound.play();

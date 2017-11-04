@@ -1,0 +1,16 @@
+{
+    "airborne": "false",
+    "base speed": "12.0",
+    "attacks": [""],
+    "name": "Player",
+    "sprite": "kittenTransparent3",
+    "health": "1000.0",
+    "brain parameter": "",
+    "category": ["ALLY"],
+    "base attack": "25.0",
+    "brain": "NONE",
+    "mask": [
+        "ALLY",
+        "WARP"
+    ]
+}

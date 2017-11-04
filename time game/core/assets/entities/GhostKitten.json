@@ -1,0 +1,13 @@
+{
+    "airborne": "false",
+    "base speed": "",
+    "attacks": [""],
+    "name": "GhostKitten",
+    "sprite": "kittenTransparentBlue",
+    "health": "",
+    "brain parameter": "",
+    "category": [""],
+    "base attack": "",
+    "brain": "NONE",
+    "mask": [""]
+}

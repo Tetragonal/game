@@ -1,0 +1,13 @@
+{
+    "airborne": "false",
+    "base speed": "10.0",
+    "attacks": ["PistolBullet"],
+    "name": "Addled Mouse Thug",
+    "sprite": "AddledMouse",
+    "health": "100.0",
+    "brain parameter": "0.016, 3, 24",
+    "category": ["ENEMY"],
+    "base attack": "25.0",
+    "brain": "SIMPLE_AGGRO",
+    "mask": ["ENEMY"]
+}

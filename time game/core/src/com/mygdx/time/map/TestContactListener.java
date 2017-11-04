@@ -9,7 +9,6 @@ import com.mygdx.time.entities.CollidableEntity;
 import com.mygdx.time.entities.Mob;
 import com.mygdx.time.entities.Player;
 import com.mygdx.time.entities.Projectile;
-import com.mygdx.time.entities.WanderingEnemy;
 import com.mygdx.time.screens.LevelScreen;
 
 public class TestContactListener implements ContactListener{
@@ -21,31 +20,28 @@ public class TestContactListener implements ContactListener{
 	
 	@Override
 	public void beginContact(Contact contact) {
-		/*
-		if(contact.getFixtureA().getBody().getUserData() instanceof WanderingEnemy || contact.getFixtureB().getBody().getUserData() instanceof WanderingEnemy){
-			System.out.println("bubly collision");
-		}
-		*/
 		Object contactA = contact.getFixtureA().getBody().getUserData();
 		Object contactB = contact.getFixtureB().getBody().getUserData();
 		
 		if(contactA instanceof CollidableEntity && contactB instanceof CollidableEntity){
-			CollidableEntity a = (CollidableEntity) contactA;
-			CollidableEntity b = (CollidableEntity) contactB;
-			a.collideWith(b);
-			b.collideWith(a);
+			if(contactA instanceof Mob || contactB instanceof Mob){
+				CollidableEntity a = (CollidableEntity) contactA;
+				CollidableEntity b = (CollidableEntity) contactB;
+				a.collideWith(b);
+				b.collideWith(a);
+			}
+				
 		}
 		
-		//temp until terrain becomes CollidableEntity
-		if(contact.getFixtureA().getBody().getUserData() instanceof Projectile){
+		//destroy projectiles on contact with terrain
+		if(contact.getFixtureA().getBody().getUserData() instanceof MapObject && contact.getFixtureA().getBody().getUserData() instanceof Projectile){
 			((Projectile)contactA).isFlaggedForDelete = true;
 		}
-		if(contact.getFixtureB().getBody().getUserData() instanceof Projectile){
+		if(contact.getFixtureA().getBody().getUserData() instanceof MapObject && contact.getFixtureB().getBody().getUserData() instanceof Projectile){
 			((Projectile)contactB).isFlaggedForDelete = true;
 		}
 		
-		////
-		
+		//warp player
 		if(contact.getFixtureA().getBody().getUserData() instanceof MapObject){
 			if(contact.getFixtureB().getBody().getUserData() instanceof Player){
 				if(((MapObject)(contact.getFixtureA().getBody().getUserData())).getProperties().get("warp") != null){

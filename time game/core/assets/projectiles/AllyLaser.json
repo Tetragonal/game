@@ -1,0 +1,13 @@
+{
+    "airborne": "true",
+    "on expire parameter": "",
+    "base damage": "",
+    "damage multi": "1.0",
+    "name": "AllyLaser",
+    "sprite": "laser2",
+    "on hit": "CHILL",
+    "type": "standard",
+    "on expire": "",
+    "type parameter": "",
+    "on hit parameter": "10.0"
+}

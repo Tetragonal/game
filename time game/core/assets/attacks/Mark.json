@@ -1,0 +1,12 @@
+{
+    "airborne": "false",
+    "on expire parameter": "frostExplosion",
+    "damage multi": "",
+    "name": "Mark",
+    "sprite": "mark",
+    "on hit": "",
+    "type": "",
+    "on expire": "SPAWN",
+    "type parameter": "",
+    "on hit parameter": ""
+}

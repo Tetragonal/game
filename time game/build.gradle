@@ -27,6 +27,7 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url "http://dl.bintray.com/hi5dev/maven" }
     }
 }
 
@@ -50,8 +51,10 @@ project(":core") {
         compile 'com.hi5dev.box2d_pexml:box2d-pexml:0.0.1'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        compile "org.json:json:20141113"
         compile fileTree(dir:"libs", include: "*.jar")
     }
+   
 }
 
 tasks.eclipse.doLast {

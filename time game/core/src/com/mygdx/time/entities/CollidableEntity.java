@@ -1,39 +1,38 @@
 package com.mygdx.time.entities;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.mygdx.time.map.Game;
+import com.mygdx.time.Game;
+import com.mygdx.time.manager.EntityLoader;
 import com.mygdx.time.screens.GameStage;
 
 public abstract class CollidableEntity extends Entity{
 	//old Box2D collision/movement, change later (movement will be in Mob)
 	protected Vector2 direction = new Vector2();
 	protected float moveAngle;
-	protected Vector2 worldDestination = new Vector2();
+	public Vector2 worldDestination = new Vector2();
 	protected float modifiedMovementSpeed = 10f;
 	protected Body body;
 	protected String entityName;
 	protected boolean isAirborne;
 	public boolean isSolid;
+	public int type;
 	
-	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, boolean isSensor) {
-		super(x, y, entityName);
+	public CollidableEntity(float x, float y, GameStage gameStage, String entityName, int type, boolean isSensor) {
+		super(x, y, entityName, type);
 		this.entityName = entityName;
 		this.gameStage = gameStage;
-		createBody(x, y, isSensor);
+		this.type = type;
 		isSolid = !isSensor;
+		//should call createBody
 	}
 	
-	public void createBody(float x, float y, boolean isSensor){
-		isAirborne = EntityEnum.valueOf(entityName).isAirborne();
+	public void createBody(float x, float y, boolean isSensor, short categoryBits, short maskBits){
+		isAirborne = Boolean.parseBoolean(EntityLoader.getValue(entityName, "airborne", type));
 		BodyDef bd = new BodyDef();
 		bd.type = BodyDef.BodyType.DynamicBody;
 		
@@ -45,7 +44,7 @@ public abstract class CollidableEntity extends Entity{
 
 		body = gameStage.getWorld().createBody(bd);
 		
-		gameStage.getLoader().attachFixture(body, EntityEnum.valueOf(entityName).getPhysicsName(), fd, sprite.getWidth());
+		gameStage.getLoader().attachFixture(body, EntityLoader.getValue(entityName, "sprite", type), fd, sprite.getWidth());
 		body.setUserData(this);
 	    body.setTransform(x, y, 0);
 	    body.setFixedRotation(true);
@@ -53,14 +52,15 @@ public abstract class CollidableEntity extends Entity{
 	    sprite.setOrigin(0f,0f);
 		
 		Filter f = new Filter();
-	    f.categoryBits = EntityEnum.valueOf(entityName).getCategory();
-	    f.maskBits = EntityEnum.valueOf(entityName).getMask();
+	    f.categoryBits = categoryBits;
+	    f.maskBits = maskBits;
     	if(isAirborne){
+    		f.categoryBits = (short) (f.categoryBits | Game.MASK_AIRBORNE);
     		f.maskBits = (short) (f.maskBits | Game.MASK_AIRBORNE);
     	}else{
+    		f.categoryBits = (short) (f.categoryBits | Game.MASK_GROUNDED);
     		f.maskBits = (short) (f.maskBits | Game.MASK_GROUNDED);
     	}
-		
 		for(int i=0; i<body.getFixtureList().size; i++){
 			body.getFixtureList().get(i).setFilterData(f);
 		}

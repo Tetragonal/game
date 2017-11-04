@@ -1,0 +1,13 @@
+{
+    "airborne": "false",
+    "base speed": "7.0",
+    "attacks": ["Katzbalger"],
+    "name": "Addled Dog",
+    "sprite": "AddledDog",
+    "health": "145.0",
+    "brain parameter": "0.016, 3, 16",
+    "category": ["ENEMY"],
+    "base attack": "25.0",
+    "brain": "SIMPLE_AGGRO",
+    "mask": ["ENEMY"]
+}

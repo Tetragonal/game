@@ -3,9 +3,15 @@ package com.mygdx.time.entities;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.mygdx.time.Game;
+import com.mygdx.time.brains.Brain;
+import com.mygdx.time.brains.BrainEnum;
+import com.mygdx.time.combat.Attack;
 import com.mygdx.time.combat.Buff;
-import com.mygdx.time.map.Game;
+import com.mygdx.time.manager.EntityLoader;
 import com.mygdx.time.screens.GameStage;
+
+import attacks.AttackEnum;
 
 public class Mob extends CollidableEntity{
 
@@ -13,27 +19,46 @@ public class Mob extends CollidableEntity{
 	
 	public boolean isSleeping;
 	
-	public float health, maxHealth = 500;
+	public float health, maxHealth;
 	
 	public int baseArmor, modifiedArmor;
 	public int baseFireResist, modifiedFireResist;
 	public int baseIceResist, modifiedIceResist;
 	public int baseLightningResist, modifiedLightningResist;
 	
-	public float baseMovementSpeed = 10;
-	public int baseAttack, modifiedAttack;
+	public float baseMovementSpeed = 0;
+	public float baseAttack, modifiedAttack;
 	
 	ArrayList<Buff> buffList = new ArrayList<Buff>();
 	
+	Attack attack;
+	Brain brain;
 
-	public Mob(float x, float y, GameStage gameStage, String entityName, boolean isAirborne) {
-		super(x, y, gameStage, entityName, false);
+	public Mob(float x, float y, GameStage gameStage, String entityName){
+		super(x, y, gameStage, entityName, Game.MOB, false);
+		createBody(x, y, !isSolid, EntityLoader.getCategory(entityName), EntityLoader.getMask(entityName));
+		String attackName = EntityLoader.getValue(entityName, "attack", Game.MOB);
+		if(attackName != null){
+			String[] attackArgs = EntityLoader.getValue(attackName, "attack parameter", Game.ATTACK).split(", ");
+			this.attack = AttackEnum.valueOf(attackName).createAttack(attackArgs, this);
+		}
+		String[] brainArgs = EntityLoader.getValue(entityName, "brain parameter", Game.MOB).split(", ");
+		this.brain = BrainEnum.valueOf(EntityLoader.getValue(entityName, "brain", Game.MOB)).createBrain(brainArgs);
+		if(this.brain != null){
+			this.brain.setParent(this);
+		}
+		//no destination
 		worldDestination.set(x+sprite.getWidth()/2, y+sprite.getHeight()/2);
+		
+		baseMovementSpeed = Float.parseFloat(EntityLoader.getValue(entityName, "base speed", Game.MOB));
+		baseAttack = Float.parseFloat(EntityLoader.getValue(entityName, "base attack", Game.MOB));
+		maxHealth = Float.parseFloat(EntityLoader.getValue(entityName, "health", Game.MOB));
 		health = maxHealth;
+		recalculateStats();
 	}
 	
-	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, GameStage gameStage, String entityName){
-		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 10, gameStage, entityName);
+	public void fireProjectile(float offsetX, float offsetY, float damage, float speed, float angleDeg, GameStage gameStage, String entityName, boolean isAlly){
+		Projectile projectile = new Projectile(getX()+sprite.getWidth()/2+offsetX, getY()+sprite.getHeight()/2+offsetY, damage, speed, angleDeg, 10, gameStage, entityName, isAlly);
 		getStage().addActor(projectile);
 	}
 	
@@ -44,6 +69,9 @@ public class Mob extends CollidableEntity{
 		}
 		if(!isSleeping){
 			super.act(delta);
+			if(brain != null){
+				brain.act();
+			}
 			if(health <= 0){
 				isFlaggedForDelete = true;
 			}
@@ -71,9 +99,21 @@ public class Mob extends CollidableEntity{
 		return health*1f/maxHealth;
 	}
 	
-	public void addBuff(Buff buff){
+	public boolean addBuff(Buff buff){
+		if(buff.maxStacks != Buff.NO_STACK_LIMIT){
+			int count = 0;
+			for(int i=0; i<buffList.size(); i++){
+				if(buff.id == buffList.get(i).id){
+					count++;
+				}
+			}
+			if(buff.maxStacks<=count){
+				return false;
+			}
+		}
 		buffList.add(buff);
 		recalculateStats();
+		return true;
 	}
 	
 	public void removeBuff(Buff buff){
@@ -92,7 +132,7 @@ public class Mob extends CollidableEntity{
 		int percentLightningResist = 0;
 		float flatMovementSpeed = baseMovementSpeed;
 		int percentMovementSpeed = 0;
-		int flatAttack = baseAttack;
+		float flatAttack = baseAttack;
 		int percentAttack = 0;
 		
 		for(Buff buff : buffList){

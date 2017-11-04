@@ -1,0 +1,13 @@
+{
+    "airborne": "false",
+    "base speed": "3.0",
+    "attacks": ["EnemyLaser"],
+    "name": "AggroFlamy",
+    "sprite": "kingflamy",
+    "health": "10000.0",
+    "brain parameter": "0.004, 2",
+    "category": ["ENEMY"],
+    "base attack": "25.0",
+    "brain": "AGGRO_ENEMY_TEST",
+    "mask": ["ENEMY"]
+}

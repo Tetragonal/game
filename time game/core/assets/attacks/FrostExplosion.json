@@ -1,0 +1,12 @@
+{
+    "airborne": "false",
+    "on expire parameter": "",
+    "damage multi": "",
+    "name": "FrostExplosion",
+    "sprite": "frostExplosion",
+    "on hit": "BLIZZARD_CHILL",
+    "type": "",
+    "on expire": "",
+    "type parameter": "",
+    "on hit parameter": "10.0"
+}

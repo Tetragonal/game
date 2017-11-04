@@ -1,0 +1,13 @@
+{
+    "airborne": "true",
+    "on expire parameter": "",
+    "base damage": "",
+    "damage multi": "1.0",
+    "name": "EnemyLaser",
+    "sprite": "laser",
+    "on hit": "ARMOR_BREAK",
+    "type": "standard",
+    "on expire": "",
+    "type parameter": "",
+    "on hit parameter": "5.0"
+}

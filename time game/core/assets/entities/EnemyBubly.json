@@ -1,0 +1,13 @@
+{
+    "airborne": "false",
+    "base speed": "5.0",
+    "attacks": [""],
+    "name": "EnemyBubly",
+    "sprite": "bubly",
+    "health": "500.0",
+    "brain parameter": "0.016, 3",
+    "category": ["ENEMY"],
+    "base attack": "0.0",
+    "brain": "WANDERING",
+    "mask": ["ENEMY"]
+}

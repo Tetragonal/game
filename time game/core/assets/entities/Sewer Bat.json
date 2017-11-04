@@ -1,0 +1,13 @@
+{
+    "airborne": "true",
+    "base speed": "10.0",
+    "attacks": ["BatSwipe"],
+    "name": "Sewer Bat",
+    "sprite": "SewerBat",
+    "health": "75.0",
+    "brain parameter": "0.016, 3, 28",
+    "category": ["ENEMY"],
+    "base attack": "25.0",
+    "brain": "SIMPLE_AGGRO",
+    "mask": ["ENEMY"]
+}

@@ -1,0 +1,12 @@
+{
+    "airborne": "false",
+    "on expire parameter": "",
+    "damage multi": "1.0",
+    "name": "Slash",
+    "sprite": "slash",
+    "on hit": "",
+    "type": "SLASH",
+    "on expire": "",
+    "type parameter": "",
+    "on hit parameter": ""
+}

@@ -10,6 +10,7 @@ public class GhostKitten extends Entity{
 	public GhostKitten(float x, float y, Player attachedPlayer) {
 		super(x, y, (Texture)TimeGame.assets.get("img/kittenTransparentBlue.png"));
 		this.parentPlayer = attachedPlayer;
+		this.sprite.setAlpha(0.5f);
 	}
 	
 	public void act(float delta){

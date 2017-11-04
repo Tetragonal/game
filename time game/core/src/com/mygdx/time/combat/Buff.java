@@ -1,8 +1,12 @@
 package com.mygdx.time.combat;
 
-import com.mygdx.time.map.Game;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.mygdx.time.Game;
 
 public class Buff {
+	
+	public static final int NO_STACK_LIMIT = -1;
+	
 	public int startTick;
 	public int endTick;
 	public boolean isPermanent = false;
@@ -27,7 +31,10 @@ public class Buff {
 	
 	public double damagePerTick;
 	
+	public int maxStacks = 1;
 	public boolean isVisible = false;
+	public int id;
+	public Sprite sprite = null;
 	
 	public Buff(int duration){		
 		startTick = Game.gameTick;
@@ -36,5 +43,10 @@ public class Buff {
 	
 	public Buff(){		
 		isPermanent = true;
+	}
+	
+	public void setSprite(Sprite sprite){
+		isVisible = true;
+		this.sprite = sprite;
 	}
 }

@@ -1,8 +1,18 @@
 package com.mygdx.time.screens;
 
 public enum LevelScreenEnum {
+	//temporary
 	
-	//idea: add the data from MapOne, MapTwo, etc into the level screen enum and remove the classes entirely?
+	SewersMap1 {
+		public LevelScreen setScreen(String previousMap) {
+			LevelScreen SewersMap1 = new LevelScreen(previousMap, "SewersMap1", "map/SewersMap1.tmx");
+			SewersMap1.musicFile = "sound/goreshit - zomb.mp3";
+			SewersMap1.musicVolume = 0.2f;
+			SewersMap1.startX = 5;
+			SewersMap1.startY = 2;
+			return SewersMap1;
+		}
+	},
 	
 	map_1 {
 		public LevelScreen setScreen(String previousMap) {

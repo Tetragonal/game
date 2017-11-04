@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
+import com.mygdx.time.Game;
 import com.mygdx.time.TimeGame;
-import com.mygdx.time.map.Game;
 
 public class MobHealthBar extends Entity{
 	

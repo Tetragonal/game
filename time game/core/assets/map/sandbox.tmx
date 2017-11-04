@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" nextobjectid="3">
+<map version="1.0.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" nextobjectid="3">
  <tileset firstgid="1" name="magecity" tilewidth="32" tileheight="32" tilecount="360" columns="8">
   <image source="magecity.png" width="256" height="1450"/>
   <tile id="266">
@@ -271,4 +271,5 @@
  </objectgroup>
  <objectgroup name="Collision (grounded)"/>
  <objectgroup name="Collision (aerial)"/>
+ <objectgroup name="Mobs"/>
 </map>
